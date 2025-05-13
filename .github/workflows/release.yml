@@ -54,14 +54,12 @@ jobs:
         pyinstaller --name kpi_cee \\
                     --onedir \\
                     --noconsole \\
-                    --add-data "templates${{ matrix.os_name == 'windows' && ';' || ':' }}templates" \\
-                    --add-data "static${{ matrix.os_name == 'windows' && ';' || ':' }}static" \\
+                    --add-data "templates${{ runner.os == 'Windows' && ';' || ':' }}templates" \\
+                    --add-data "static${{ runner.os == 'Windows' && ';' || ':' }}static" \\
                     app.py
-      shell: ${{ matrix.shell_type }}
 
     - name: Package executable
       run: ${{ matrix.package_cmd }}
-      shell: ${{ matrix.shell_type }}
 
     - name: Upload distributable as artifact
       uses: actions/upload-artifact@v4
