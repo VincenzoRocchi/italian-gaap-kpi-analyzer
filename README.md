@@ -45,7 +45,7 @@ This gives you more flexibility and is great if you want to see the code or modi
 
 2.  **Clone the repository:**
     ```bash
-    git clone https://github.com/yourusername/kpi_cee.git # Replace with your repo path
+    git clone https://github.com/VincenzoRocchi/kpi_cee.git
     cd kpi_cee
     ```
 
@@ -60,18 +60,6 @@ This gives you more flexibility and is great if you want to see the code or modi
     ```bash
     pip install -r requirements.txt
     ```
-
-5.  **Set the `SECRET_KEY` environment variable:**
-    Flask sessions require a `SECRET_KEY`. For local use, you can set this environment variable to any non-empty string. For example:
-    *   macOS/Linux (in your terminal):
-        ```bash
-        export SECRET_KEY='my_local_dev_key'
-        ```
-    *   Windows (Command Prompt):
-        ```bash
-        set SECRET_KEY=my_local_dev_key
-        ```
-    (This key is for session security; it doesn't need to be overly complex for local runs.)
 
 6.  **Run the application:**
     ```bash
