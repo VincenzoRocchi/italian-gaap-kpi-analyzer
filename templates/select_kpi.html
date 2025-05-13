@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Seleziona KPI{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <form action="{{ url_for('input_required_fields') }}" method="post">
+        <h1><strong>Seleziona</strong> gli Indicatori (KPI) da Calcolare</h1>
+        <hr>
+        <p class="text-muted mb-4">Scegli uno o più indicatori cliccando sulle relative schede. Verranno richiesti solo i dati necessari per i calcoli selezionati.</p>
+
+        {# KPI Tiles using Bootstrap Grid and Cards #}
+        <div class="row g-3 mb-4 kpi-selection-grid">
+            {% for key, kpi in available_kpis.items() %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card kpi-tile h-100"> {# Add h-100 for equal height cards #}
+                    <input class="form-check-input kpi-checkbox" 
+                           type="checkbox" 
+                           name="kpi_keys" 
+                           value="{{ key }}" 
+                           id="kpi-{{ key }}">
+                    <div class="card-body d-flex flex-column"> 
+                        <label class="flex-grow-1" 
+                               for="kpi-{{ key }}"
+                               data-bs-toggle="tooltip" 
+                               data-bs-html="true" 
+                               data-bs-placement="top"
+                               title="<strong class='text-primary'>{{ kpi.name_display }}</strong><br>
+                                      <strong>Formula:</strong> {{ kpi.tooltip_info.formula_display }}<br>
+                                      <strong>Range Ottimale:</strong> {{ kpi.tooltip_info.optimal_range_cee }}<br>
+                                      <strong>Interpretazione:</strong> {{ kpi.tooltip_info.interpretation_notes }}">
+                            <h5 class="card-title mb-2">
+                                {{ kpi.name_display.replace('Indice di ', '') }} 
+                            </h5>
+                            <p class="card-text small text-muted flex-grow-1">{{ kpi.description_short }}</p>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <hr class="my-4">
+        <div class="d-flex justify-content-end mb-4">
+            <button type="submit" class="btn btn-primary">Procedi all'Inserimento Dati <i class="bi bi-arrow-right-circle-fill ms-1"></i></button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }} {# Include scripts from base.html if any #}
+<script>
+// Enable Bootstrap tooltips allowing HTML
+var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+  return new bootstrap.Tooltip(tooltipTriggerEl, {
+    html: true // Allow HTML content in tooltips
+  })
+})
+</script>
+{% endblock %} 

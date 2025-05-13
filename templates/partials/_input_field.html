@@ -1,0 +1,16 @@
+{# templates/partials/_input_field.html #}
+<div class="mb-3 input-group-sm">
+    <label for="pos_{{ pos }}" class="form-label">
+        Pos. {{ pos }}: {{ position_names.get(pos, 'Nome Posizione Mancante') }}
+    </label>
+    <input type="text" class="form-control form-control-sm"
+           id="pos_{{ pos }}"
+           name="pos_{{ pos }}"
+           {# Use default filter to handle None or missing values gracefully #}
+           value="{{ data.get(pos|string)|default('', true) }}"
+           placeholder="0.00">
+    {# Div to hold the mapping details - populated by JavaScript #}
+    <div id="mapping-{{ pos }}" class="internal-mapping-details mt-1 text-muted small" style="display: none;">
+        {# Content added by JS based on dropdown selection #}
+    </div>
+</div> 

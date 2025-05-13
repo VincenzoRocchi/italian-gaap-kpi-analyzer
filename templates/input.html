@@ -1,0 +1,420 @@
+{% extends 'base.html' %}
+
+{% block title %}Dati Bilancio{% endblock %}
+
+{% block content %}
+  {# --- NEW Wrapper for Title and Selected KPIs --- #}
+  <div class="title-kpi-wrapper d-flex justify-content-between align-items-center mb-3">
+      {# Title on the left #}
+      <h1><strong>Inserisci</strong> i Dati di bilancio</h1>
+
+      {# Selected KPIs Scroller on the right #}
+      {% if selected_kpi_details %}
+          <div class="selected-kpi-scroller flex-shrink-1"> {# Allow shrinking #}
+              <div class="selected-kpi-inner-flex">
+                  {% for key, kpi in selected_kpi_details.items() %}
+                      <div class="card selected-display-tile me-2 flex-shrink-0" 
+                           data-bs-toggle="tooltip" 
+                           data-bs-html="true" 
+                           data-bs-placement="bottom"
+                           title="<strong class='text-primary'>{{ kpi.name_display }}</strong><br>
+                                  <strong>Formula:</strong> {{ kpi.tooltip_info.formula_display }}<br>
+                                  <strong>Range Ottimale:</strong> {{ kpi.tooltip_info.optimal_range_cee }}<br>
+                                  <strong>Interpretazione:</strong> {{ kpi.tooltip_info.interpretation_notes }}">
+                          <div class="card-body">
+                              <span class="card-title-small">{{ kpi.name_display.replace('Indice di ', '') }}</span>
+                          </div>
+                      </div>
+                  {% endfor %}
+              </div>
+          </div>
+      {% endif %}
+  </div>
+  {# --- END Wrapper --- #}
+
+  {# Display Errors #}
+  {% if errors %}
+    <div class="alert alert-danger shadow-sm mb-4" role="alert">
+      <h5 class="alert-heading"><i class="bi bi-exclamation-triangle-fill me-1"></i>Errori di Validazione:</h5>
+      <ul class="mb-0 ps-3">
+        {% for field, messages in errors.items() %}
+          <li><strong>{{ field }}:</strong> {{ messages|join(', ') }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  {# --- NEW Top Control Row --- #}
+  <div class="row mb-4 align-items-center">
+      {# Mapping Dropdown - Aligned Left #}
+      <div class="col-md-5 col-lg-6">
+          {% if available_mappings %}
+              <div class="input-group mapping-select-group">
+                  <label class="input-group-text" for="mappingTemplateSelect">
+                      <i class="bi bi-diagram-3-fill me-2"></i>Mappatura Conti:
+                  </label>
+                  <select class="form-select" id="mappingTemplateSelect">
+                      <option value="" selected>Nessuna Mappatura</option>
+                      {% for key, mapping_info in available_mappings.items() %}
+                          <option value="{{ key }}">{{ mapping_info.display_name }}</option>
+                      {% endfor %}
+                  </select>
+              </div>
+          {% else %}
+              <div>&nbsp;</div> {# Placeholder if no mappings to keep alignment #}
+          {% endif %}
+      </div>
+
+      {# Action Buttons - Aligned Right #}
+      <div class="col-md-7 col-lg-6 d-flex justify-content-end">
+          <a href="{{ url_for('index') }}" class="btn btn-secondary me-2">
+              <i class="bi bi-arrow-left-circle"></i> Indietro
+          </a>
+          {# DUPLICATED Calculate Button - triggers form submit #}
+          <button type="button" class="btn btn-primary" onclick="document.getElementById('input-data-form').requestSubmit();">
+              <i class="bi bi-calculator-fill"></i> Calcola KPI Selezionati
+          </button>
+      </div>
+  </div>
+  {# --- END NEW Top Control Row --- #}
+
+  {# --- ADDED Explanatory Text --- #}
+  <p class="text-muted small mb-4">
+      Utilizza il menu "Mappatura Conti" per visualizzare i codici corrispondenti nel piano dei conti selezionato (es. Automotive Dealer). 
+      Inserisci i valori numerici nelle caselle sottostanti utilizzando il punto (.) come separatore decimale (es. 1234.56). Puoi anche inserire semplici somme (es. 1000 + 250.50).
+  </p>
+
+  <hr class="mb-4">
+
+  <form action="{{ url_for('calculate') }}" method="post" id="input-data-form">
+    
+    {# Moving Calculate Button Here #}
+    <button type="submit" class="btn btn-primary visually-hidden" id="submit-form-button" aria-hidden="true">Calcola</button> {# Hidden, triggered by visible button #}
+
+    <div class="row g-4"> {# Use grid for two main columns #}
+      
+      <!-- ATTIVO Column -->
+      <div class="col-md-6">
+        {% if structure.get('assets') %}
+          <div class="card h-100 shadow-sm border-light-subtle">
+            <div class="card-header fw-bold bg-light bg-opacity-75">{{ section_titles.get('assets', 'ATTIVO') }}</div>
+            <div class="card-body p-3">
+              {# Iterate through Level 1 keys like non_current, current, prepaid #}
+              {% for l1_key, l1_value in structure['assets'].items() %}
+                  <div class="mb-4"> {# Increased margin between major sections #}
+                      {# Display Level 1 Title (e.g., B) Immobilizzazioni) #}
+                      <h4 class="mb-3 border-bottom pb-1">{{ section_titles.get(l1_key, l1_key.replace('_', ' ').title()) }}</h4>
+                      
+                      {# Check if Level 1 value is a dictionary (Level 2 exists) #}
+                      {% if l1_value is mapping %} 
+                          {# Iterate through Level 2 keys like intangible, tangible... #}
+                          {% for l2_key, l2_positions in l1_value.items() %}
+                              <div class="ms-2 mb-3"> {# Indent Level 2 slightly #}
+                                  {# Display Level 2 Title (e.g., B.I) Immobilizzazioni Immateriali) #}
+                                  <h5 class="text-muted fw-normal mb-2">{{ section_titles.get(l2_key, l2_key.replace('_', ' ').title()) }}</h5>
+                                  {# Display Inputs for this Level 2 group #}
+                                  {% for pos in l2_positions %}
+                                      <div class="mb-2 input-group input-group-sm">
+                                          <span class="input-group-text" style="width: 70px;">Pos. {{ pos }}</span>
+                                          <input type="text" class="form-control auto-calculate" name="pos_{{ pos }}"
+                                                 id="pos_{{ pos }}" value="{{ data.get(pos|string, '') }}"
+                                                 inputmode="decimal" placeholder="0.00">
+                                      </div>
+                                      <small class="text-muted d-block mb-1 ms-1">{{ position_names.get(pos|int, '') }}</small>
+                                      {# Div to display automotive codes #}
+                                      <div class="mapping-display-area" data-cee-pos="{{ pos }}"></div>
+                                  {% endfor %}
+                              </div>
+                          {% endfor %}
+                      {# Check if Level 1 value is a list (Direct positions like prepaid) #}
+                      {% elif l1_value is iterable and l1_value is not string %} 
+                          {# Display Inputs directly under Level 1 Title #}
+                           <div class="ms-2 mb-3"> {# Indent inputs slightly #}
+                              {% for pos in l1_value %}
+                                   <div class="mb-2 input-group input-group-sm">
+                                      <span class="input-group-text" style="width: 70px;">Pos. {{ pos }}</span>
+                                      <input type="text" class="form-control auto-calculate" name="pos_{{ pos }}"
+                                             id="pos_{{ pos }}" value="{{ data.get(pos|string, '') }}"
+                                             inputmode="decimal" placeholder="0.00">
+                                  </div>
+                                  <small class="text-muted d-block mb-1 ms-1">{{ position_names.get(pos|int, '') }}</small>
+                                  {# Div to display automotive codes #}
+                                  <div class="mapping-display-area" data-cee-pos="{{ pos }}"></div>
+                              {% endfor %}
+                          </div>
+                      {% endif %}
+                  </div>
+              {% endfor %}
+            </div> {# End card-body #}
+          </div> {# End card #}
+        {% endif %}
+      </div>
+
+      <!-- PASSIVO E PATRIMONIO NETTO Column -->
+      <div class="col-md-6">
+        {% if structure.get('equity_liabilities') %}
+          <div class="card h-100 shadow-sm border-light-subtle"> 
+            <div class="card-header fw-bold bg-light bg-opacity-75">{{ section_titles.get('equity_liabilities', 'PASSIVO E PATRIMONIO NETTO') }}</div>
+            <div class="card-body p-3">
+              {# Iterate through Level 1 keys like equity, provisions, liabilities, accrued #}
+               {% for l1_key, l1_value in structure['equity_liabilities'].items() %}
+                  <div class="mb-4"> {# Increased margin between major sections #}
+                      {# Display Level 1 Title (e.g., A) Patrimonio Netto) #}
+                      <h4 class="mb-3 border-bottom pb-1">{{ section_titles.get(l1_key, l1_key.replace('_', ' ').title()) }}</h4>
+                      
+                      {# Check if Level 1 value is a dictionary (Level 2 exists) #}
+                      {% if l1_value is mapping %} 
+                          {# Iterate through Level 2 keys like capital, reserves, long_term... #}
+                          {% for l2_key, l2_positions in l1_value.items() %}
+                              <div class="ms-2 mb-3"> {# Indent Level 2 slightly #}
+                                  {# Display Level 2 Title (e.g., A.I) Capitale) #}
+                                  <h5 class="text-muted fw-normal mb-2">{{ section_titles.get(l2_key, l2_key.replace('_', ' ').title()) }}</h5>
+                                  {# Display Inputs for this Level 2 group #}
+                                  {% for pos in l2_positions %}
+                                       <div class="mb-2 input-group input-group-sm">
+                                          <span class="input-group-text" style="width: 70px;">Pos. {{ pos }}</span>
+                                          <input type="text" class="form-control auto-calculate" name="pos_{{ pos }}"
+                                                 id="pos_{{ pos }}" value="{{ data.get(pos|string, '') }}"
+                                                 inputmode="decimal" placeholder="0.00">
+                                      </div>
+                                      <small class="text-muted d-block mb-1 ms-1">{{ position_names.get(pos|int, '') }}</small>
+                                      {# Div to display automotive codes #}
+                                      <div class="mapping-display-area" data-cee-pos="{{ pos }}"></div>
+                                  {% endfor %}
+                              </div>
+                          {% endfor %}
+                       {# Check if Level 1 value is a list (Direct positions like provisions, accrued) #}
+                       {% elif l1_value is iterable and l1_value is not string %} 
+                           {# Display Inputs directly under Level 1 Title #}
+                           <div class="ms-2 mb-3"> {# Indent inputs slightly #}
+                              {% for pos in l1_value %}
+                                   <div class="mb-2 input-group input-group-sm">
+                                      <span class="input-group-text" style="width: 70px;">Pos. {{ pos }}</span>
+                                      <input type="text" class="form-control auto-calculate" name="pos_{{ pos }}"
+                                             id="pos_{{ pos }}" value="{{ data.get(pos|string, '') }}"
+                                             inputmode="decimal" placeholder="0.00">
+                                  </div>
+                                  <small class="text-muted d-block mb-1 ms-1">{{ position_names.get(pos|int, '') }}</small>
+                                  {# Div to display automotive codes #}
+                                  <div class="mapping-display-area" data-cee-pos="{{ pos }}"></div>
+                              {% endfor %}
+                          </div>
+                      {% endif %}
+                  </div>
+              {% endfor %}
+            </div> {# End card-body #}
+          </div> {# End card #}
+        {% endif %}
+      </div>
+
+    </div> {# End row #}
+
+    {# Bottom Buttons Row #}
+    <hr class="my-4">
+    <div class="d-flex justify-content-end mb-4">
+        <a href="{{ url_for('index') }}" class="btn btn-secondary me-2">
+            <i class="bi bi-arrow-left-circle"></i> Indietro
+        </a>
+        {# This button now triggers the hidden form submit button #}
+        <button type="button" class="btn btn-primary" onclick="document.getElementById('input-data-form').requestSubmit();">
+            <i class="bi bi-calculator-fill"></i> Calcola KPI Selezionati
+        </button>
+    </div>
+
+  </form>
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }} {# Include base scripts like tooltip initializer #}
+
+{# Embed mapping data as JSON in a script tag #}
+<script type="application/json" id="allMappingDataJson">
+    {{ all_mapping_data_json|safe }}
+</script>
+
+<script>
+    // Retrieve and parse mapping data
+    let ALL_MAPPING_DATA = {}; // Default to empty object
+    try {
+        const mappingDataElement = document.getElementById('allMappingDataJson');
+        if (mappingDataElement) {
+            ALL_MAPPING_DATA = JSON.parse(mappingDataElement.textContent || '{}');
+        } else {
+            console.warn('Mapping data script tag not found.');
+        }
+    } catch (e) {
+        console.error('Error parsing mapping data JSON:', e);
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+
+        // Safely handle mapping data initialization and event listener
+        try {
+            const mappingSelect = document.getElementById('mappingTemplateSelect');
+            const displayAreas = document.querySelectorAll('.mapping-display-area');
+        
+            if (mappingSelect && typeof ALL_MAPPING_DATA !== 'undefined') { 
+                mappingSelect.addEventListener('change', function() {
+                    const selectedMappingKey = this.value;
+                    const selectedMapping = selectedMappingKey && ALL_MAPPING_DATA ? ALL_MAPPING_DATA[selectedMappingKey] : null;
+        
+                    displayAreas.forEach(area => {
+                        const ceePos = area.getAttribute('data-cee-pos');
+                        if (selectedMapping && selectedMapping[ceePos] && selectedMapping[ceePos].length > 0) {
+                            // Wrap each code in <strong> for specific styling
+                            const styledCodes = selectedMapping[ceePos].map(code => `<strong>${code}</strong>`).join(', ');
+                            area.innerHTML = `<em><i class="bi bi-arrow-right-short"></i> Auto: ${styledCodes}</em>`;
+                        } else {
+                            area.innerHTML = ''; 
+                        }
+                    });
+                });
+                // Trigger change event on load if a mapping is pre-selected (useful if navigating back)
+                if(mappingSelect.value) { 
+                    mappingSelect.dispatchEvent(new Event('change'));
+                }
+            } else if (!mappingSelect) {
+              console.warn('Mapping select dropdown not found.');
+            } else {
+              console.warn('Mapping data (ALL_MAPPING_DATA) is not defined or invalid.');
+            }
+        } catch (error) {
+            console.error("Error initializing mapping functionality:", error);
+            // Allow the rest of the script (safeCalculate) to run
+        }
+
+        // Auto-calculate sum functionality
+        function safeCalculate(expression) {
+            // Basic regex check for allowed characters (digits, whitespace, plus, minus, dot, comma)
+            if (!/^[\d\s\+\-\.,]*$/.test(expression)) {
+                console.warn("safeCalculate: Invalid characters detected:", expression);
+                return null;
+            }
+            expression = expression.replace(/,/g, '.'); // Normalize comma to dot for float parsing
+            try {
+                let result = 0;
+                let currentNumber = '';
+                let currentOperator = '+';
+                // Iterate through the expression character by character
+                for (let i = 0; i < expression.length; i++) {
+                    const char = expression[i];
+
+                    if ((char >= '0' && char <= '9') || char === '.') {
+                        currentNumber += char; // Build the current number string
+                    } else if (char === '+' || char === '-') {
+                        // When an operator is found, process the previous number
+                        if (currentNumber) {
+                            const num = parseFloat(currentNumber);
+                            if (isNaN(num)) {
+                                console.warn("safeCalculate: Parsing failed for number:", currentNumber);
+                                return null; // Bail if number parsing fails
+                            }
+                            // Apply the previous operator
+                            result = (currentOperator === '+') ? result + num : result - num;
+                            currentNumber = ''; // Reset for the next number
+                        }
+                        currentOperator = char; // Store the new operator
+                    } else if (char !== ' ') {
+                        // If it's not a digit, dot, operator, or space, consider it invalid
+                        console.warn("safeCalculate: Invalid character encountered:", char);
+                        return null;
+                    }
+                    // Spaces are ignored by not doing anything
+                }
+
+                // Process the last number in the expression after the loop
+                if (currentNumber) {
+                    const num = parseFloat(currentNumber);
+                    if (isNaN(num)) {
+                         console.warn("safeCalculate: Parsing failed for last number:", currentNumber);
+                         return null;
+                    }
+                    result = (currentOperator === '+') ? result + num : result - num;
+                }
+
+                return result; // Return the final calculated result
+            } catch (e) {
+                console.error("safeCalculate error:", e);
+                return null; // Return null on any calculation error
+            }
+        }
+
+        // Attach event listener to all relevant input fields
+        document.querySelectorAll('.auto-calculate').forEach(input => {
+            console.log('Attaching blur listener to:', input.id); // Debug: Check listener attachment
+            input.addEventListener('blur', function() {
+                console.log('Blur event triggered for:', this.id); // Debug: Check event triggering
+                let value = this.value.trim();
+                console.log('Input value on blur:', value); // Debug: See the value
+
+                if (value.includes('+') || value.includes('-')) {
+                    console.log('Expression detected, calling safeCalculate...'); // Debug
+                    const result = safeCalculate(value);
+                    console.log('safeCalculate result:', result); // Debug
+                    if (result !== null) {
+                        // Format result to 2 decimal places with comma separator
+                        this.value = result.toFixed(2).replace('.', ',');
+                    } else {
+                        // Handle invalid expressions - maybe clear the field or show an error?
+                        console.warn("Invalid expression for auto-calculate:", value);
+                        // Optionally clear: this.value = '';
+                    }
+                } else if (value) {
+                    // Also format simple numbers (without + or -) on blur
+                    console.log('Simple number detected, attempting format...'); // Debug
+                    const num = parseFloat(value.replace(',', '.'));
+                    console.log('Parsed number:', num); // Debug
+                    if (!isNaN(num)) {
+                        this.value = num.toFixed(2).replace('.', ',');
+                    } else {
+                         // Handle invalid simple numbers
+                         console.warn("Invalid number input:", value);
+                         // Optionally clear: this.value = ''; 
+                    }
+                } else {
+                     console.log('Input value is empty.'); // Debug
+                }
+            });
+        });
+
+        // --- ADDED: Calculate expressions before form submission ---
+        const actionUrl = "{{ url_for('calculate') }}"; // Store URL from Jinja
+        const selector = `form[action="${actionUrl}"]`; // Build selector using template literal
+        const form = document.querySelector(selector);
+        if (form) {
+            form.addEventListener('submit', function(event) {
+                console.log('Form submit event triggered.'); // Debug
+                document.querySelectorAll('.auto-calculate').forEach(input => {
+                    let value = input.value.trim();
+                    // Only recalculate if it looks like an expression
+                    if (value.includes('+') || value.includes('-')) {
+                        console.log('Checking input before submit:', input.id, 'Value:', value); // Debug
+                        const result = safeCalculate(value);
+                        if (result !== null) {
+                            input.value = result.toFixed(2).replace('.', ',');
+                            console.log('Updated input', input.id, 'to:', input.value); // Debug
+                        } else {
+                            // Optional: Handle invalid expression on submit, e.g., alert user or prevent submit
+                            console.warn('Invalid expression in field', input.id, 'on submit:', value);
+                            // Example: event.preventDefault(); alert('Invalid calculation in field ' + input.id);
+                        }
+                    } else if (value) {
+                        // Also ensure simple numbers are correctly formatted (e.g., if entered without blur)
+                        const num = parseFloat(value.replace(',', '.'));
+                        if (!isNaN(num)) {
+                            input.value = num.toFixed(2).replace('.', ',');
+                        }
+                    }
+                });
+                console.log('Proceeding with form submission.'); // Debug
+                // Submission proceeds automatically unless event.preventDefault() is called
+            });
+        } else {
+            console.error('Could not find the form to attach submit listener.');
+        }
+        // --- END ADDED CODE ---
+
+    }); // End DOMContentLoaded
+</script>
+{% endblock %} 

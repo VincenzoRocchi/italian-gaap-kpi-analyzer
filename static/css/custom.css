@@ -1,0 +1,378 @@
+body {
+    background-color: #f8f9fa; /* Light grey background for the whole page */
+}
+
+/* Main container adjustments if you want a different background for content area */
+/* main.container {
+    background-color: #ffffff;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+    border-radius: 0.25rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+} */
+
+/* Style for the main H1 title on pages */
+h1 {
+    color: #343a40; /* Darker grey for main titles */
+    margin-bottom: 1rem; /* Adjusted from 0.75rem for slightly more space */
+}
+
+/* Card styling enhancements for input page */
+.card.h-100.shadow-sm.border-light-subtle {
+    border-width: 1px; /* Ensure border is visible */
+    border-color: #e9ecef !important; /* Slightly more pronounced border */
+}
+
+.card-header.fw-bold.bg-light.bg-opacity-75 {
+    background-color: #e9ecef !important; /* A bit more distinct header background */
+    color: #495057;
+    font-size: 1.1rem; /* Slightly larger header font */
+    border-bottom: 1px solid #dee2e6;
+}
+
+/* Level 1 Section Titles (e.g., B) Immobilizzazioni) */
+.card-body h4.mb-3.border-bottom.pb-1 {
+    font-size: 1.2rem; 
+    color: #0d6efd; 
+    margin-top: 1.5rem; /* RESTORED from 1rem */
+    margin-bottom: 1rem !important; /* RESTORED from 0.75rem */
+    padding-bottom: 0.75rem !important; /* RESTORED from 0.5rem */
+}
+/* First h4 in a card body should have less top margin */
+.card-body > div:first-child > h4.mb-3.border-bottom.pb-1 {
+    margin-top: 0.5rem; /* RESTORED from 0.25rem */
+}
+
+
+/* Level 2 Sub-Section Titles (e.g., B.I) Immobilizzazioni Immateriali) */
+.card-body h5.text-muted.fw-normal.mb-2 {
+    font-size: 1rem;
+    color: #6c757d !important; 
+    margin-top: 1rem; /* RESTORED from 0.75rem */
+    margin-bottom: 0.75rem !important; /* RESTORED from 0.5rem */
+}
+
+/* Input group enhancements */
+.input-group-text {
+    background-color: #f8f9fa; /* Lighter background for text part */
+    border-right: 0; /* Remove right border to blend with input */
+    color: #495057;
+    font-size: 0.9rem; /* Slightly smaller for "Pos. X" */
+}
+
+.form-control.auto-calculate {
+    font-size: 1rem; 
+    /* max-width: 250px; */ /* REMOVED max-width to revert to full width */
+    padding: 0.4rem 0.75rem; 
+}
+.form-control.auto-calculate:focus {
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15); /* Softer focus shadow */
+    border-color: #86b7fe;
+}
+
+/* Input Row (Pos X + Input Field) */
+.input-group.input-group-sm.mb-2 { 
+    /* Keep reduced margin from last step or revert to default mb-2 (0.5rem)? */
+    /* Let's try reverting to default Bootstrap spacing for inputs */
+     margin-bottom: 0.5rem !important; /* Reverted from 0.2rem to default mb-2 */
+}
+
+/* Position Name (e.g., "Costi di impianto...") - Larger & Modernized */
+small.text-muted.d-block.mb-1.ms-1 {
+    font-size: 0.95rem; 
+    color: #495057 !important; 
+    /* Restore slightly more space below the larger text */
+    margin-bottom: 0.75rem !important; /* Reverted from 0.4rem */ 
+    padding-left: 5px; 
+    line-height: 1.3; 
+    letter-spacing: 0.01em; 
+}
+
+/* Container for each item (input group + small description) */
+/* This selector might need to be more specific if there are other .ms-2.mb-3 divs */
+.card-body .ms-2.mb-3 > div:not(:last-child) { 
+    /* If the div directly containing an input and its description needs less bottom margin */
+    /* This targets the wrapper for each 'Pos. X' group if it's structured like that */
+    /* For example, if HTML is <div class="ms-2 mb-3"> <div>INPUT_GROUP</div> <small>DESC</small> </div> */
+    /* We primarily adjusted the direct children above, this is for finer control if needed */
+}
+
+/* Reduce margin between major sections (L1_KEY blocks in Jinja) */
+.card-body > div.mb-4 {
+    margin-bottom: 1.5rem !important; /* RESTORED from 0.75rem (default mb-4) */
+}
+
+/* Reduce margin between subsections (L2_KEY blocks in Jinja) */
+.card-body .ms-2.mb-3 { 
+     margin-bottom: 1rem !important; /* RESTORED from 0.75rem (default mb-3) */
+}
+
+/* Buttons styling consistency (optional, if default primary is not desired) */
+/* .btn-primary {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+.btn-primary:hover {
+    background-color: #004494;
+    border-color: #00357a;
+} */
+
+/* === KPI Selection Page Styling === */
+
+/* Grid container */
+.kpi-selection-grid {
+    /* Add any specific container styles if needed */
+}
+
+/* KPI Tile Card Base */
+.kpi-tile {
+    border: 1px solid #dee2e6; /* Light grey border */
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    position: relative; /* Needed for absolute positioning of checkbox */
+    background-color: #ffffff; /* White background */
+}
+
+.kpi-tile:hover {
+    transform: translateY(-3px); /* Subtle lift effect */
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1); /* Soft shadow on hover */
+    border-color: #adb5bd; /* Slightly darker border on hover */
+}
+
+.kpi-tile .card-body {
+    padding: 1.25rem;
+    cursor: pointer; /* Indicate the whole body (label) is clickable */
+}
+
+/* KPI Title */
+.kpi-tile .card-title {
+    font-size: 1.1rem;
+    font-weight: 500; /* Medium weight */
+    color: #343a40; /* Dark grey */
+    margin-bottom: 0.5rem !important;
+}
+
+/* KPI Description */
+.kpi-tile .card-text {
+    font-size: 0.85rem;
+    color: #6c757d; /* Standard muted grey */
+    line-height: 1.4;
+}
+
+/* Checkbox Styling & Positioning - HIDE visually but keep functional */
+.kpi-checkbox {
+    position: absolute; /* Keep for positioning logic if needed elsewhere, though hidden */
+    opacity: 0; /* Make invisible */
+    pointer-events: none; /* Prevent interaction */
+    width: 1px; /* Minimize space */
+    height: 1px;
+    margin: -1px;
+    border: 0;
+    padding: 0;
+    white-space: nowrap;
+    clip-path: inset(100%);
+    clip: rect(0 0 0 0);
+    overflow: hidden;
+}
+
+/* Style the tile when its (hidden) checkbox is checked */
+.kpi-tile:has(input[type="checkbox"]:checked) {
+    border-color: #0d6efd; /* Blue border when checked */
+    box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.25); /* Subtle blue glow */
+    background-color: #e7f1ff; /* Very light blue background when selected */
+}
+
+/* Styling for the ratio icon - REMOVED */
+/* .kpi-ratio-icon {
+    font-size: 0.8em; 
+    color: #6c757d; 
+    vertical-align: middle; 
+} */
+
+/* Ensure label click selects the checkbox */
+.kpi-tile label {
+    cursor: pointer;
+    display: block; /* Ensure label takes up space */
+    height: 100%; /* Make label fill the card body height */
+}
+
+/* Optional: Style the card-body slightly differently when checked if needed */
+/* .kpi-tile:has(input[type="checkbox"]:checked) .card-body {
+    background-color: #f8f9fa; 
+} */
+
+/* REMOVED previous checkbox visibility styles */
+/* .kpi-tile input[type="checkbox"]:checked + .card-body { ... } */
+/* .kpi-tile input[type="checkbox"]:checked { ... } */
+/* .kpi-tile input[type="checkbox"]:checked ~ .card-body { ... } */
+
+/* General Page Adjustments for Consistency */
+hr {
+    border-top-color: #dee2e6; /* Lighter hr */
+}
+
+/* Tooltip adjustments if needed */
+.tooltip-inner {
+  background-color: #343a40; /* Darker tooltip background */
+  color: #fff;
+}
+.tooltip .tooltip-arrow::before {
+  border-top-color: #343a40; /* Match arrow to background */
+  border-right-color: #343a40; /* Match arrow to background */
+  border-bottom-color: #343a40; /* Match arrow to background */
+  border-left-color: #343a40; /* Match arrow to background */
+}
+
+/* === Input Page Specific Styles === */
+
+/* Wrapper for Title and KPIs */
+.title-kpi-wrapper {
+    /* Uses Bootstrap flex classes */
+    gap: 1rem; /* Add some space between title and tiles */
+}
+
+.title-kpi-wrapper h1 {
+    white-space: nowrap; /* Prevent title wrapping */
+}
+
+/* Scroller for horizontal overflow */
+.selected-kpi-scroller {
+    /* flex-grow: 1; */ /* REMOVED - let it take natural width */
+    max-width: 50%; /* Limit width to prevent pushing title too much */
+    overflow-x: auto; 
+    overflow-y: hidden; 
+    white-space: nowrap; 
+    -webkit-overflow-scrolling: touch; 
+    scrollbar-width: thin; 
+    scrollbar-color: #ced4da #f8f9fa; 
+}
+/* Basic scrollbar styling for WebKit browsers */
+.selected-kpi-scroller::-webkit-scrollbar {
+    height: 6px; /* Height of horizontal scrollbar */
+}
+.selected-kpi-scroller::-webkit-scrollbar-track {
+    background: #f8f9fa; /* Track color */
+    border-radius: 3px;
+}
+.selected-kpi-scroller::-webkit-scrollbar-thumb {
+    background-color: #ced4da; /* Thumb color */
+    border-radius: 3px;
+}
+.selected-kpi-scroller::-webkit-scrollbar-thumb:hover {
+    background-color: #adb5bd; /* Darker thumb on hover */
+}
+
+/* Inner flex container for tiles */
+.selected-kpi-inner-flex {
+    display: inline-flex; 
+    padding-bottom: 8px; 
+}
+
+/* Individual Selected KPI Tile Styling - REVISED */
+.selected-display-tile {
+    border: 1px solid #dee2e6 !important; /* Standard light grey border */
+    background-color: #ffffff !important; /* White background */
+    /* Apply the hover shadow effect permanently */
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1) !important; 
+    border-radius: 0.3rem; /* Slightly larger radius */
+    padding: 0 !important; 
+    cursor: default; 
+    transform: translateY(-2px); /* Slight lift to enhance floating */
+}
+
+.selected-display-tile .card-body {
+    padding: 0.4rem 0.85rem; /* Slightly larger padding */
+    text-align: center;
+}
+
+.selected-display-tile .card-title-small {
+    font-size: 0.85rem; /* Slightly larger font size */
+    font-weight: 500; 
+    color: #495057; /* Standard dark grey text */
+    display: block; 
+    white-space: nowrap; 
+}
+
+/* Mapping Dropdown Styling */
+.mapping-select-group .input-group-text {
+    background-color: #e9ecef; /* Light grey background */
+    border-color: #ced4da;
+    color: #495057;
+    font-weight: 500;
+}
+.mapping-select-group .form-select {
+    border-color: #ced4da;
+}
+.mapping-select-group .form-select:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25); /* Standard Bootstrap focus */
+}
+
+/* Style for mapping details display */
+.mapping-display-area {
+    font-size: 0.8rem; 
+    color: #6c757d;    /* Base text is muted grey */
+    font-weight: normal; /* Remove general bolding */
+    margin: 0.1rem 0 0.3rem 0.5rem; 
+    padding: 0.1rem 0.4rem;
+    min-height: 1.1rem; 
+    white-space: normal; 
+}
+/* Style ONLY the numbers (now wrapped in <strong>) */
+.mapping-display-area strong {
+    color: #343a40; /* Dark grey for numbers */
+    font-weight: 600; /* Bolder weight for numbers */
+}
+.mapping-display-area em i {
+     color: #6c757d; 
+     font-size: 0.9em;
+     margin-right: 0.2em; 
+     font-weight: normal; 
+}
+
+/* Input field modernization */
+.input-group-text {
+    /* Styles previously added, ensure they don't conflict */
+    font-weight: 500; /* Slightly bolder text for Pos. X */
+    font-size: 0.85rem; /* Adjust if needed */
+}
+
+.form-control.auto-calculate {
+    /* Styles previously added */
+    padding: 0.4rem 0.75rem; /* Adjust padding for better feel */
+    font-size: 1rem; /* Ensure readable font size */
+    /* Remove left border was already done */
+}
+.form-control.auto-calculate:focus {
+    /* Styles previously added */
+    /* Ensure focus is clear but not overwhelming */
+     background-color: #fff; /* Ensure white background on focus */
+     z-index: 3; /* Ensure focused input is visually on top */
+}
+
+/* Main content cards for Attivo/Passivo */
+/* Ensuring they match the modern theme */
+.card.h-100.shadow-sm.border-light-subtle { /* This selector is from input.html */
+    /* border-width: 1px; */ /* Already in previous styles if not overridden */
+    /* border-color: #e9ecef !important; */ /* Already in previous styles */
+    box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.05) !important; /* Softer, more modern shadow */
+    background-color: #fff; /* Ensure white background */
+}
+
+.card.h-100.shadow-sm.border-light-subtle .card-header {
+    /* font-size: 1.1rem; */ /* From previous */
+    /* color: #495057; */ /* From previous */
+    /* background-color: #e9ecef !important; */ /* From previous */
+    /* border-bottom: 1px solid #dee2e6; */ /* From previous */
+    /* Make sure these are not too heavy if we want a cleaner look */
+}
+
+/* Top control row */
+.row.mb-4.align-items-center { /* Targeting the specific row */
+    margin-bottom: 1rem !important; /* Reduced for tighter top spacing */
+}
+
+/* HR below top control row */
+hr.mb-4 {
+    margin-top: 0; /* Remove any top margin */
+    margin-bottom: 1.5rem !important; /* Space before main content */
+} 

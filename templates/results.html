@@ -1,0 +1,155 @@
+{# templates/results.html #}
+{% extends "base.html" %}
+
+{% block title %}Risultati KPI{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1><strong>Risultati</strong> dell'Analisi</h1>
+    <hr> {# Keep horizontal rule #}
+    <p class="text-muted small mb-4">
+        Di seguito sono riportati i valori calcolati per i KPI selezionati, basati sui dati di bilancio inseriti. Controlla la sezione "Dati e Quadratura" per verificare la correttezza dei totali e rivedere i dati specifici utilizzati per ciascun indicatore.
+    </p>
+
+    <div class="row mt-4">
+        <!-- Left Column: KPI Results -->
+        <div class="col-lg-7 mb-4 mb-lg-0 border-end pe-lg-4">
+            <div class="row row-cols-1 g-4">
+                {# Iterate over selected_kpi_keys to potentially maintain order #}
+                {% for kpi_key in selected_kpi_keys %}
+                    {% if kpi_key in results %} {# Check if result exists for the selected KPI #}
+                    {% set result_value = results[kpi_key]['value'] %}
+                    {% set kpi_details = available_kpis[kpi_key] %}
+                    <div class="col">
+                        <div class="card h-100 shadow-sm border-light-subtle"> {# Use subtle border #}
+                            <div class="card-header bg-primary bg-opacity-75 text-white"> {# Slightly transparent header #}
+                               {{ kpi_details.name_display }}
+                            </div>
+                            <div class="card-body">
+                                <div class="d-md-flex justify-content-between align-items-start"> {# Flex container, responsive #}
+                                    <div class="me-md-3 mb-2 mb-md-0 text-center text-md-start"> {# Left part: Value - centered on small screens #}
+                                        <h6 class="card-title mb-1">Valore:</h6>
+                                        <span class="{{ 'bg-danger' if result_value is not number else 'bg-success' }} text-white fs-4 d-inline-block p-2 rounded shadow-sm"> {# Enhanced badge style #}
+                                            {% if result_value is number %}
+                                                {{ "%.2f"|format(result_value) }}
+                                                {# Basic check if KPI name suggests percentage or common KPI keys #}
+                                                {% if 'percentage' in kpi_details.name_display|lower or 'percentuale' in kpi_details.name_display|lower or kpi_key in ['roe', 'roi', 'ros'] %} % {% endif %}
+                                            {% else %}
+                                                {{ result_value }} {# Display error messages like 'Dati insufficienti' #}
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                    <div class="flex-grow-1"> {# Right part: Details #}
+                                        <p class="card-text mb-1"><small class="text-muted">Formula: {{ kpi_details.tooltip_info.formula_display }}</small></p>
+                                        {% if kpi_details.tooltip_info.optimal_range_cee %}
+                                            <p class="card-text mb-1"><small><strong>Intervallo Ottimale (CEE):</strong> {{ kpi_details.tooltip_info.optimal_range_cee }}</small></p>
+                                        {% endif %}
+                                         {% if kpi_details.tooltip_info.interpretation_notes %}
+                                            <p class="card-text mb-0"><small><strong>Interpretazione:</strong> {{ kpi_details.tooltip_info.interpretation_notes }}</small></p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                {% else %}
+                <div class="col-12"> {# Span full width if no KPIs #}
+                    <div class="alert alert-warning" role="alert">
+                        Nessun KPI è stato calcolato o selezionato. <a href="{{ url_for('index') }}" class="alert-link">Torna indietro</a> per selezionare KPI e inserire i dati.
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Right Column: Input Data Summary & Balance Check -->
+        <div class="col-lg-5 ps-lg-4">
+             <div class="card shadow-sm border-light-subtle"> {# Wrap right column content in a card #}
+                <div class="card-body">
+                    <h2 class="fs-5 card-title mb-3"><i class="bi bi-clipboard-data me-2"></i>Dati e Quadratura</h2>
+
+                    {% if balance_check %}
+                    <div class="alert {{ 'alert-success' if balance_check.valid else 'alert-danger' }} mt-3 p-2" role="alert"> {# Reduced padding #}
+                        <strong class="d-block mb-1">Controllo Quadratura:</strong>
+                        {% if balance_check.valid %}
+                            <i class="bi bi-check-circle-fill me-1"></i>Corretto
+                        {% else %}
+                            <i class="bi bi-exclamation-triangle-fill me-1"></i>Non Corretto
+                        {% endif %}
+                             <br><small>Attivo: {{ "%.2f €"|format(balance_check.assets) }}</small>
+                             <br><small>Passivo+Netto: {{ "%.2f €"|format(balance_check.liabilities_equity) }}</small>
+                    </div>
+                    {% else %}
+                     <div class="alert alert-secondary mt-3 p-2" role="alert">Controllo quadratura non disponibile.</div>
+                    {% endif %}
+
+                    <h3 class="mt-4 fs-6">Dati Inseriti per KPI</h3> {# Smaller heading #}
+                    <div class="accordion accordion-flush mt-2" id="inputDataAccordion"> {# Flush accordion #}
+                        {# Iterate over selected_kpi_keys to maintain order and relevance #}
+                        {% for kpi_key in selected_kpi_keys|sort %}
+                            {% if kpi_key in input_data_by_kpi and input_data_by_kpi[kpi_key] %} {# Check if data exists for this KPI #}
+                            {% set kpi_details = available_kpis[kpi_key] %}
+                            {% set positions_data = input_data_by_kpi[kpi_key] %}
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="heading-{{ kpi_key }}">
+                                    <button class="accordion-button collapsed py-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{ kpi_key }}" aria-expanded="false" aria-controls="collapse-{{ kpi_key }}"> {# Reduced padding #}
+                                        {{ kpi_details.name_display }}
+                                    </button>
+                                </h2>
+                                <div id="collapse-{{ kpi_key }}" class="accordion-collapse collapse" aria-labelledby="heading-{{ kpi_key }}" data-bs-parent="#inputDataAccordion">
+                                    <div class="accordion-body p-2" style="max-height: 300px; overflow-y: auto;">
+                                        <ul class="list-group list-group-flush">
+                                             {# Keys in positions_data are now strings from app.py #}
+                                             {% for pos_str_key, value in positions_data.items()|sort %}
+                                                {% set pos_int = pos_str_key|int %} {# Convert string key to int for position_names lookup #}
+                                                <li class="list-group-item d-flex justify-content-between align-items-center px-1 py-1"> {# Reduced padding #}
+                                                    <span>
+                                                        Pos. {{ pos_int }}:
+                                                        <small class="text-muted d-block" style="line-height: 1.1;">{{ position_names.get(pos_int, 'Nome non trovato') }}</small>
+                                                    </span>
+                                                     <span class="badge bg-secondary rounded-pill fw-normal"> {# Normal font weight #}
+                                                        {% if value is number %}
+                                                            {{ "%.2f"|format(value) }}
+                                                        {% elif value is none %}
+                                                             N/D {# Explicitly handle None #}
+                                                        {% else %}
+                                                             {{ value }} {# Display any other non-numeric value e.g. Error string #}
+                                                        {% endif %}
+                                                    </span>
+                                                </li>
+                                             {% else %}
+                                                <li class="list-group-item px-1 py-1">Nessun dato specifico richiesto/inserito.</li>
+                                             {% endfor %}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        {% else %}
+                         <div class="alert alert-secondary mt-2 p-2" role="alert">
+                            Nessun dato specifico per KPI da mostrare o nessun KPI selezionato.
+                         </div>
+                        {% endfor %}
+                    </div>
+                </div> {# End card-body #}
+             </div> {# End card #}
+        </div>
+    </div>
+
+    {# Buttons Row - Placed below the main content, outside the cards #}
+    <hr class="my-4">
+    <div class="d-flex justify-content-end mb-4">
+        <a href="{{ url_for('input_required_fields') }}" class="btn btn-secondary me-2">
+            <i class="bi bi-pencil-square"></i> Modifica Dati
+        </a>
+        {# Optionally add a back to selection button here if needed #}
+        {# <a href="{{ url_for('index') }}" class="btn btn-secondary">Indietro (Selezione KPI)</a> #}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+{# Add specific scripts for this page if needed #}
+{% endblock %}
