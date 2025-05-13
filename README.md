@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-# KPI CEE (KPI Calculator for Italian Financial Statements) - Beta Version 0.2.x
-=======
 # KPI CEE (KPI Calculator for Italian Financial Statements) - Version 0.2.8
->>>>>>> legacy/flask-web
 
 <!-- Badges: License, Python Version, Flask Version -->
 ![License](https://img.shields.io/github/license/VincenzoRocchi/kpi_cee)
@@ -32,17 +28,10 @@ There are two main ways to use KPI CEE:
 
 Download ready-to-run executables for Windows and Linux. For macOS, running from source (see below) is the recommended method.
 
-<<<<<<< HEAD
-1.  Go to the **[Releases Page](https://github.com/VincenzoRocchi/kpi_cee/releases)**
-2.  Download the archive for your OS (e.g., `kpi_cee-windows.zip`).
-3.  Extract the archive.
-4.  Run the `kpi_cee` executable inside the extracted folder.
-=======
 1.  Go to the **[Releases Page](https://github.com/VincenzoRocchi/kpi_cee/releases)**.
 2.  Download the archive for your OS (e.g., `kpi_cee-windows.zip` or `kpi_cee-linux.tar.gz`).
 3.  Extract the archive.
 4.  Run the `kpi_cee` executable found inside the extracted folder.
->>>>>>> legacy/flask-web
 
 For more detailed OS-specific instructions, see the **[Installation Guide in our Docs](./docs/01_installation.md)** (Note: macOS executable instructions may be outdated).
 
@@ -108,8 +97,6 @@ For more installation options, see the [official `uv` installation guide](https:
         # or if they are removed from pyproject.toml's main dependencies in the future.
         ```
 
-<<<<<<< HEAD
-=======
 5.  **Set the `SECRET_KEY` environment variable (Optional for Local Development):**
     Flask sessions use a `SECRET_KEY`. The application will generate a temporary one if `SECRET_KEY` is not set in your environment. For persistent sessions or if you prefer to set it explicitly for local development:
     *   macOS/Linux (in your terminal):
@@ -122,7 +109,6 @@ For more installation options, see the [official `uv` installation guide](https:
         ```
     (This key is for session security; it doesn't need to be overly complex for local runs.)
 
->>>>>>> legacy/flask-web
 6.  **Run the application:**
     ```bash
     python app.py
