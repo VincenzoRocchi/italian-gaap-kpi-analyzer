@@ -31,7 +31,7 @@ Download ready-to-run executables for your operating system.
 1.  Go to the **[Releases Page](https://github.com/VincenzoRocchi/kpi_cee/releases)**
 2.  Download the archive for your OS (e.g., `kpi_cee-windows.zip`).
 3.  Extract the archive.
-4.  Run the `kpi_cee` executable (or `kpi_cee.app` on macOS) found inside the extracted folder.
+4.  Run the `kpi_cee` executable inside the extracted folder.
 
 For more detailed OS-specific instructions, see the **[Installation Guide in our Docs](./docs/01_installation.md)**.
 
