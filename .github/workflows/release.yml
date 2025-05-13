@@ -50,13 +50,13 @@ jobs:
         # PyInstaller is already in requirements.txt
 
     - name: Build with PyInstaller
-      run: |
-        pyinstaller --name kpi_cee \\
-                    --onedir \\
-                    --noconsole \\
-                    --add-data "templates${{ runner.os == 'Windows' && ';' || ':' }}templates" \\
-                    --add-data "static${{ runner.os == 'Windows' && ';' || ':' }}static" \\
-                    app.py
+      run: >-
+        pyinstaller --name kpi_cee
+        --onedir
+        --noconsole
+        --add-data "templates${{ runner.os == 'Windows' && ';' || ':' }}templates"
+        --add-data "static${{ runner.os == 'Windows' && ';' || ':' }}static"
+        app.py
 
     - name: Package executable
       run: ${{ matrix.package_cmd }}
