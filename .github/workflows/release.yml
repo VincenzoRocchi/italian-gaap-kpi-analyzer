@@ -92,60 +92,41 @@ jobs:
         TAG: ${{ github.ref_name }}
       run: |
         # Create release notes file
-        cat <<EOF > release_notes.md
-        ## Release ${TAG}
+        cat > release_notes.md << 'EOF'
+        ## Release ${{ github.ref_name }}
 
-        Automated release for KPI CEE version ${TAG}.
+        Automated release for KPI CEE version ${{ github.ref_name }}.
 
         Download the executable for your operating system below.
 
         ### How to Run:
 
         **Windows:**
-        1. Download \`kpi_cee-windows-${TAG}.zip\`.
+        1. Download `kpi_cee-windows.zip`.
         2. Extract the archive.
-        3. Double-click \`kpi_cee.exe\`. Your browser should open automatically to the application.
+        3. Double-click `kpi_cee.exe`. Your browser should open automatically.
 
         **macOS (Intel/Rosetta 2):**
-        1. Download \`kpi_cee-macos-${TAG}.zip\`.
-        2. Extract the archive. The folder inside is \`kpi_cee\` (which may contain \`kpi_cee.app\`).
-        3. Open Terminal, navigate to the folder where you extracted \`kpi_cee\` (or the \`.app\` bundle).
-        4. Make it executable using \`chmod +x kpi_cee\`. For .app bundles, the main executable is inside, e.g., \`kpi_cee.app/Contents/MacOS/kpi_cee\`.
-        5. Run it: \`./kpi_cee\` (or double-click \`kpi_cee.app\`). Your browser should open.
-           *If you double-click and see an "unidentified developer" warning:*
-           * Right-click (or Ctrl-click) the \`kpi_cee\` file and select "Open". You might need to confirm again.
-           * Or, go to System Settings > Privacy & Security, scroll down, and you should see an option to "Open Anyway".
+        1. Download `kpi_cee-macos.zip`.
+        2. Extract the archive. Navigate to the folder.
+        3. Make it executable: `chmod +x kpi_cee/kpi_cee`
+        4. Run: `./kpi_cee/kpi_cee`. Your browser should open.
 
         **Linux:**
-        1. Download \`kpi_cee-linux-${TAG}.tar.gz\`.
-        2. Extract the archive: \`tar -xzvf kpi_cee-linux-${TAG}.tar.gz\`. This usually creates a \`kpi_cee\` file.
-        3. Open Terminal, navigate to the folder where you extracted the file.
-        4. Make it executable: \`chmod +x kpi_cee\`
-        5. Run it: \`./kpi_cee\`. Your browser should open automatically to the application.
-
-        ---
-        Files in this release:
+        1. Download `kpi_cee-linux.tar.gz`.
+        2. Extract: `tar -xzvf kpi_cee-linux.tar.gz`.
+        3. Make executable: `chmod +x kpi_cee/kpi_cee`
+        4. Run: `./kpi_cee/kpi_cee`. Your browser should open.
         EOF
 
-        # Prepare array for gh release upload
-        declare -a upload_files=()
-
-        echo "" >> release_notes.md
-        echo "Checksums (SHA256):" >> release_notes.md
-        # Artifacts are downloaded into subdirectories named after the artifact name.
-        # e.g., artifacts/kpi_cee-windows-v0.3.0/kpi_cee-windows.zip
-        find artifacts -type f -print0 | while IFS= read -r -d $'\0' file_path; do
-          file_name=\$(basename "\$file_path")
-          # Add to release notes with just the file name
-          sha256sum "\$file_path" | awk -v name="\$file_name" '{print "  - \`" name "\`:", $1}' >> release_notes.md
-          # Add to upload list with its full path from download
-          upload_files+=("\$file_path")
+        # Find and upload all artifacts
+        find artifacts -name "*.zip" -o -name "*.tar.gz" | while read -r file; do
+          echo "Found: $file"
         done
 
-        # Create the release and upload all files
-        # The `gh release create` command will use the commit message of the tag for the main body if not overridden by --notes or --notes-file
-        # Using --notes-file provides more control.
-        gh release create ${TAG} \\
-          --title "Release ${TAG}" \\
-          --notes-file release_notes.md \\
-          "\${upload_files[@]}" # Upload all collected files 
+        # Create release and upload files
+        gh release create ${TAG} \
+          --title "Release ${TAG}" \
+          --notes-file release_notes.md \
+          artifacts/*/*.zip \
+          artifacts/*/*.tar.gz 
