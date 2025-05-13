@@ -1,7 +1,7 @@
-from flask import Flask, render_template, request, session, redirect, url_for, flash
-import os
-from datetime import datetime
-import json
+import tkinter as tk
+from tkinter import messagebox # For potential error popups
+import ttkbootstrap as ttk
+from ttkbootstrap.constants import *
 
 # Import from our modules
 from app_logic.constants import (
@@ -18,161 +18,279 @@ from app_logic.constants import (
 from app_logic.calculator import calculate_selected_kpis, validate_balance_sheet
 from app_logic.validators import validate_financial_data, validate_kpi_selection
 
-app = Flask(__name__)
-# Secret key for session management. Replace with a strong, random key in production.
-app.secret_key = os.environ.get('SECRET_KEY', os.urandom(24))
+class KpiApp:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("KPI CEE Calculator - v0.3.0")
+        self.root.geometry("800x600") # Adjust as needed
 
-# Context Processor to make datetime available in templates
-@app.context_processor
-def inject_now():
-    return {'now': datetime.utcnow()} # Use utcnow for consistency
+        # --- Persisted data (equivalent to Flask session) ---
+        # We'll manage these as instance variables
+        self.selected_kpi_keys = []
+        self.required_positions = []
+        self.balance_sheet_data = {}
+        self.calculated_kpis = {}
+        # --- End Persisted data ---
 
-@app.after_request
-def add_security_headers(response):
-    """Add basic security headers to all responses."""
-    response.headers['X-Content-Type-Options'] = 'nosniff'
-    response.headers['X-Frame-Options'] = 'SAMEORIGIN'
-    return response
+        # --- Main application frames ---
+        # We'll switch between these frames to simulate pages
+        self.container = ttk.Frame(root, padding=10)
+        self.container.pack(fill=BOTH, expand=YES)
 
-@app.route('/', methods=['GET'])
-def index():
-    """Displays the KPI selection page."""
-    session.pop('balance_sheet_data', None)
-    session.pop('required_positions', None)
-    session.pop('selected_kpis', None)
-    session.pop('calculated_kpis', None)
-    return render_template('select_kpi.html', available_kpis=AVAILABLE_KPIS)
+        self.frames = {}
+        for F in (SelectKpiFrame, InputDataFrame, ResultsFrame): # Define these classes later
+            page_name = F.__name__
+            frame = F(parent=self.container, controller=self)
+            self.frames[page_name] = frame
+            # Place all frames in the same spot; we'll raise one at a time
+            frame.grid(row=0, column=0, sticky="nsew")
 
-@app.route('/input', methods=['GET', 'POST'])
-def input_required_fields():
-    if request.method == 'POST':
-        selected_kpi_keys = request.form.getlist('kpi_keys')
-        valid, error_message = validate_kpi_selection(selected_kpi_keys, AVAILABLE_KPIS)
-        if not valid:
-            flash(error_message, "warning")
-            return redirect(url_for('index'))
+        self.show_frame("SelectKpiFrame")
 
-        required_positions = set()
-        for key in selected_kpi_keys:
+    def show_frame(self, page_name):
+        '''Show a frame for the given page name'''
+        frame = self.frames[page_name]
+        frame.tkraise()
+        # You might want to call a 'refresh' or 'on_show' method on the frame here
+        if hasattr(frame, 'on_show'):
+            frame.on_show()
+
+    def get_selected_kpis(self):
+        return self.selected_kpi_keys
+
+    def set_selected_kpis(self, kpi_keys):
+        self.selected_kpi_keys = kpi_keys
+        # Determine required positions based on selected KPIs
+        required_pos_set = set()
+        for key in self.selected_kpi_keys:
             if key in KPI_REQUIREMENTS:
-                required_positions.update(KPI_REQUIREMENTS[key])
+                required_pos_set.update(KPI_REQUIREMENTS[key])
+        self.required_positions = sorted(list(required_pos_set))
+        # Initialize balance sheet data for these positions
+        self.balance_sheet_data = {str(pos): 0.0 for pos in self.required_positions}
 
-        sorted_required_positions = sorted(list(required_positions))
-        session['required_positions'] = sorted_required_positions
-        session['selected_kpis'] = selected_kpi_keys
-        existing_data = session.get('balance_sheet_data', {})
-        session['balance_sheet_data'] = {str(pos): existing_data.get(str(pos), 0.0) for pos in sorted_required_positions}
 
-    elif request.method == 'GET':
-        if 'selected_kpis' not in session or 'required_positions' not in session:
-            flash("Sessione non valida o scaduta. Seleziona nuovamente i KPI.", "warning")
-            return redirect(url_for('index'))
-        if 'balance_sheet_data' not in session:
-             session['balance_sheet_data'] = {str(pos): 0.0 for pos in session.get('required_positions', [])}
-        flash("Modifica i valori inseriti e ricalcola.", "info")
+class SelectKpiFrame(ttk.Frame):
+    def __init__(self, parent, controller):
+        super().__init__(parent)
+        self.controller = controller
 
-    else: 
-        return redirect(url_for('index'))
+        label = ttk.Label(self, text="Select KPIs to Calculate", font=("Helvetica", 16, "bold"))
+        label.pack(pady=20)
 
-    selected_kpi_keys = session.get('selected_kpis', [])
-    sorted_required_positions = session.get('required_positions', [])
-    current_data = session.get('balance_sheet_data', {})
+        # --- KPI Selection Area ---
+        self.kpi_vars = {}
+        kpi_frame = ttk.Frame(self)
+        kpi_frame.pack(pady=10, padx=20, fill=X)
 
-    if not selected_kpi_keys or not sorted_required_positions:
-        flash("Errore di sessione. Si prega di ricominciare.", "danger")
-        return redirect(url_for('index'))
+        # Create two columns for KPIs
+        col1 = ttk.Frame(kpi_frame)
+        col1.pack(side=LEFT, fill=X, expand=True, padx=5)
+        col2 = ttk.Frame(kpi_frame)
+        col2.pack(side=LEFT, fill=X, expand=True, padx=5)
 
-    selected_kpi_details = {key: AVAILABLE_KPIS[key] for key in selected_kpi_keys if key in AVAILABLE_KPIS}
+        kpi_items = list(AVAILABLE_KPIS.items())
+        midpoint = (len(kpi_items) + 1) // 2
 
-    required_structure = {}
-    for main_cat, sub_cats in BALANCE_SHEET_STRUCTURE.items():
-        req_main_cat = {}
-        for sub_cat_name, content in sub_cats.items():
-            if isinstance(content, dict):
-                req_sub_cat = {}
-                for nested_name, nested_positions in content.items():
-                    req_nested_pos = [p for p in nested_positions if p in sorted_required_positions]
-                    if req_nested_pos:
-                        req_sub_cat[nested_name] = req_nested_pos
-                if req_sub_cat:
-                     req_main_cat[sub_cat_name] = req_sub_cat
-            elif isinstance(content, list):
-                req_pos = [p for p in content if p in sorted_required_positions]
-                if req_pos:
-                    req_main_cat[sub_cat_name] = req_pos
-        if req_main_cat:
-            required_structure[main_cat] = req_main_cat
+        for i, (key, kpi_details) in enumerate(kpi_items):
+            var = tk.BooleanVar()
+            # The kpi_details already contains the name directly from AVAILABLE_KPIS.items()
+            cb = ttk.Checkbutton(col1 if i < midpoint else col2, text=kpi_details["name_display"], variable=var, bootstyle="primary")
+            cb.pack(anchor="w", pady=2)
+            self.kpi_vars[key] = var
+        # --- End KPI Selection Area ---
 
-    all_mapping_data = {
-        "automotive_dealer": CEE_TO_AUTOMOTIVE_CODES
-    }
+        proceed_button = ttk.Button(self, text="Next: Input Financial Data",
+                                   command=self.proceed_to_input, bootstyle="success")
+        proceed_button.pack(pady=20)
 
-    return render_template('input.html',
-                           structure=required_structure, 
-                           data=current_data, 
-                           required_positions=sorted_required_positions,
-                           position_names=POSITION_NAMES,
-                           selected_kpi_details=selected_kpi_details, 
-                           section_titles=SECTION_TITLES,
-                           available_mappings=AVAILABLE_MAPPINGS, 
-                           all_mapping_data_json=json.dumps(all_mapping_data)
-                           )
-
-@app.route('/calculate', methods=['POST'])
-def calculate():
-    if 'required_positions' not in session or 'selected_kpis' not in session:
-         flash("Sessione scaduta o invalida. Si prega di ricominciare.", "danger")
-         return redirect(url_for('index'))
-
-    required_positions = session['required_positions']
-    selected_kpi_keys = session['selected_kpis']
-
-    try:
-        balance_sheet_data, errors = validate_financial_data(request.form, required_positions)
-        if errors:
-            for field_name, error_message in errors.items():
-                flash(f"{error_message}", "warning")
-            return redirect(url_for('input_required_fields'))
-        session['balance_sheet_data'] = balance_sheet_data
+    def proceed_to_input(self):
+        selected_keys = [key for key, var in self.kpi_vars.items() if var.get()]
         
-    except Exception as e:
-        flash(f'Errore durante l\'elaborazione dei dati: {e}', 'danger')
-        return redirect(url_for('input_required_fields'))
+        # AVAILABLE_KPIS is imported at the module level and can be used directly here.
+        valid, error_message = validate_kpi_selection(selected_keys, AVAILABLE_KPIS)
+        if not valid:
+            messagebox.showwarning("Invalid Selection", error_message)
+            return
 
-    balance_check = validate_balance_sheet(balance_sheet_data)
-    kpis_results = calculate_selected_kpis(balance_sheet_data, selected_kpi_keys)
-    session['calculated_kpis'] = kpis_results
+        self.controller.set_selected_kpis(selected_keys)
+        self.controller.show_frame("InputDataFrame")
 
-    input_data_by_kpi_display = {}
-    for kpi_key in selected_kpi_keys:
-        input_data_by_kpi_display[kpi_key] = {}
-        if kpi_key in KPI_REQUIREMENTS:
-            for pos in KPI_REQUIREMENTS[kpi_key]:
-                pos_str = str(pos)
-                if pos_str in balance_sheet_data:
-                    input_data_by_kpi_display[kpi_key][pos_str] = balance_sheet_data[pos_str]
-                else:
-                    input_data_by_kpi_display[kpi_key][pos_str] = None
+    def on_show(self):
+        # Reset checkboxes when this frame is shown
+        for key in self.kpi_vars:
+            self.kpi_vars[key].set(False)
+        # Reset controller data that depends on this page
+        self.controller.selected_kpi_keys = []
+        self.controller.required_positions = []
+        self.controller.balance_sheet_data = {}
 
-    return render_template(
-        "results.html",
-        results=kpis_results, 
-        input_data=balance_sheet_data, 
-        balance_check=balance_check, 
-        input_data_by_kpi=input_data_by_kpi_display, 
-        available_kpis=AVAILABLE_KPIS, 
-        position_names=POSITION_NAMES, 
-        selected_kpi_keys=selected_kpi_keys, 
-        section_titles=SECTION_TITLES
-    )
+
+class InputDataFrame(ttk.Frame):
+    def __init__(self, parent, controller):
+        super().__init__(parent)
+        self.controller = controller
+        # Placeholder - We will build this UI next
+        self.title_label = ttk.Label(self, text="Input Financial Data", font=("Helvetica", 16, "bold"))
+        self.title_label.pack(pady=10)
+        
+        self.inputs_frame = ttk.Frame(self) # Frame to hold dynamic inputs
+        self.inputs_frame.pack(pady=10, padx=10, fill=BOTH, expand=True)
+
+        # Navigation buttons frame
+        nav_frame = ttk.Frame(self)
+        nav_frame.pack(fill=X, pady=10, padx=10)
+
+        back_button = ttk.Button(nav_frame, text="Back to KPI Selection",
+                                 command=lambda: controller.show_frame("SelectKpiFrame"),
+                                 bootstyle="secondary")
+        back_button.pack(side=LEFT, padx=5)
+
+        calculate_button = ttk.Button(nav_frame, text="Calculate KPIs",
+                                 command=self.process_calculation, # Changed to a method
+                                 bootstyle="primary")
+        calculate_button.pack(side=RIGHT, padx=5)
+        
+        self.data_entries = {} # To store Entry widgets
+
+
+    def on_show(self):
+        # Clear previous dynamic content from inputs_frame
+        for widget in self.inputs_frame.winfo_children():
+            widget.destroy()
+        self.data_entries.clear()
+
+        if not self.controller.selected_kpi_keys:
+            self.title_label.config(text="No KPIs Selected. Go Back.")
+            return
+
+        self.title_label.config(text=f"Input Data for {len(self.controller.selected_kpi_keys)} Selected KPIs")
+        
+        # Dynamically build the input form here
+        # This is a simplified version; a scrollable area would be better for many inputs
+        
+        # Group inputs by main category and subcategory from BALANCE_SHEET_STRUCTURE
+        # For simplicity, let's just list all required positions for now
+        # A more complex layout would iterate through BALANCE_SHEET_STRUCTURE
+        
+        current_row = 0
+        for pos_key_str in self.controller.required_positions:
+            pos_key = int(pos_key_str) # Assuming positions in constants are integers
+            pos_name = POSITION_NAMES.get(pos_key, f"Position {pos_key}")
+
+            ttk.Label(self.inputs_frame, text=pos_name + ":").grid(row=current_row, column=0, sticky="w", padx=5, pady=2)
+            
+            entry_var = tk.StringVar(value=str(self.controller.balance_sheet_data.get(pos_key_str, 0.0)))
+            entry_widget = ttk.Entry(self.inputs_frame, textvariable=entry_var, width=20)
+            entry_widget.grid(row=current_row, column=1, sticky="ew", padx=5, pady=2)
+            self.data_entries[pos_key_str] = entry_var
+            current_row += 1
+        
+        self.inputs_frame.columnconfigure(1, weight=1) # Make entry column expandable
+
+    def process_calculation(self):
+        # 1. Retrieve data from self.data_entries
+        raw_form_data = {key: var.get() for key, var in self.data_entries.items()}
+
+        # 2. Validate financial data
+        # validate_financial_data expects a Flask-like form object or a dict.
+        # We need to adapt its usage or adapt the data.
+        # For now, let's assume direct usage with the dict is fine if types are okay.
+        # The original validator might need adjustment if it heavily relies on Flask's MultiDict.
+        
+        # Convert to float, handle potential errors
+        parsed_data = {}
+        errors = {}
+        for key, value_str in raw_form_data.items():
+            try:
+                parsed_data[key] = float(value_str)
+            except ValueError:
+                errors[key] = f"Invalid number for {POSITION_NAMES.get(int(key), key)}" # Assuming key is int convertible
+
+        if errors:
+            error_message = "\n".join(errors.values())
+            messagebox.showerror("Input Error", error_message)
+            return
+
+        self.controller.balance_sheet_data = parsed_data
+
+        # 3. Perform balance sheet validation (from calculator.py)
+        balance_check_messages = validate_balance_sheet(self.controller.balance_sheet_data)
+        # For now, just print this. In a real UI, display it.
+        if balance_check_messages: # If returns a list of messages
+             messagebox.showwarning("Balance Check", "\n".join(balance_check_messages))
+             # Decide if you want to proceed despite warnings, or return
+
+        # 4. Calculate KPIs
+        self.controller.calculated_kpis = calculate_selected_kpis(
+            self.controller.balance_sheet_data,
+            self.controller.selected_kpi_keys
+        )
+        
+        self.controller.show_frame("ResultsFrame")
+
+
+class ResultsFrame(ttk.Frame):
+    def __init__(self, parent, controller):
+        super().__init__(parent)
+        self.controller = controller
+        
+        self.title_label = ttk.Label(self, text="KPI Results", font=("Helvetica", 16, "bold"))
+        self.title_label.pack(pady=10)
+
+        self.results_text_area = ttk.ScrolledText(self, wrap=WORD, height=20, width=70)
+        self.results_text_area.pack(pady=10, padx=10, fill=BOTH, expand=True)
+        self.results_text_area.config(state=DISABLED) # Make it read-only initially
+
+        # Navigation buttons frame
+        nav_frame = ttk.Frame(self)
+        nav_frame.pack(fill=X, pady=10, padx=10)
+        
+        back_button = ttk.Button(nav_frame, text="Back to Input Data",
+                                 command=lambda: controller.show_frame("InputDataFrame"),
+                                 bootstyle="secondary")
+        back_button.pack(side=LEFT, padx=5)
+        
+        restart_button = ttk.Button(nav_frame, text="Start Over",
+                                 command=lambda: controller.show_frame("SelectKpiFrame"),
+                                 bootstyle="info")
+        restart_button.pack(side=RIGHT, padx=5)
+
+    def on_show(self):
+        self.results_text_area.config(state=NORMAL) # Enable writing
+        self.results_text_area.delete(1.0, END) # Clear previous results
+
+        if not self.controller.calculated_kpis:
+            self.results_text_area.insert(END, "No KPIs calculated yet. Go back to input data.")
+            self.results_text_area.config(state=DISABLED)
+            return
+
+        results_str = "Calculated KPIs:\n\n"
+        for kpi_key, result_info in self.controller.calculated_kpis.items():
+            kpi_name = AVAILABLE_KPIS.get(kpi_key, {}).get("name", kpi_key)
+            results_str += f"--- {kpi_name} ---\n"
+            results_str += f"  Value: {result_info.get('value', 'N/A')}\n"
+            results_str += f"  Interpretation: {result_info.get('interpretation', 'N/A')}\n"
+            results_str += f"  Formula: {result_info.get('formula', 'N/A')}\n"
+            
+            results_str += "  Input Data Used:\n"
+            # Assuming KPI_REQUIREMENTS maps kpi_key to a list of position keys (integers)
+            if kpi_key in KPI_REQUIREMENTS:
+                for pos_key in KPI_REQUIREMENTS[kpi_key]:
+                    pos_key_str = str(pos_key)
+                    pos_name = POSITION_NAMES.get(pos_key, f"Position {pos_key_str}")
+                    value = self.controller.balance_sheet_data.get(pos_key_str, "N/A")
+                    results_str += f"    {pos_name}: {value}\n"
+            results_str += "\n"
+        
+        self.results_text_area.insert(END, results_str)
+        self.results_text_area.config(state=DISABLED) # Make it read-only again
+
+def main():
+    # Use a ttkbootstrap theme, e.g., "litera", "darkly", "superhero"
+    root = ttk.Window(themename="litera") 
+    app = KpiApp(root)
+    root.mainloop()
 
 if __name__ == '__main__':
-    import webbrowser
-    # Try to open the browser only when running as the main script (and thus likely as an executable)
-    # This avoids opening the browser during Flask's auto-reloader development cycles.
-    if not os.environ.get("WERKZEUG_RUN_MAIN"): # WERKZEUG_RUN_MAIN is set by Flask reloader
-        try:
-            webbrowser.open_new_tab('http://127.0.0.1:5001')
-        except Exception as e:
-            print(f"Could not open browser: {e}") # Or log this appropriately
-    app.run(debug=False, use_reloader=False, host='0.0.0.0', port=5001) 
+    main() 
