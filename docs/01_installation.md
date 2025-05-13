@@ -38,20 +38,21 @@ This method requires Python to be installed on your system (Python 3.12+ recomme
     ```
 
 4.  **Set the `SECRET_KEY` environment variable:**
-    For security, Flask sessions require a secret key. For development, you can set this in your terminal:
-    *   macOS/Linux:
+    Flask uses a `SECRET_KEY` for session management. For local use or development, you can set this environment variable to any non-empty string. This key helps secure session data.
+
+    *   Example for macOS/Linux (in your terminal):
         ```bash
-        export SECRET_KEY='a_very_secret_and_random_key_should_go_here'
+        export SECRET_KEY='your_chosen_local_key'
         ```
-    *   Windows (Command Prompt):
+    *   Example for Windows (Command Prompt):
         ```bash
-        set SECRET_KEY=a_very_secret_and_random_key_should_go_here
+        set SECRET_KEY=your_chosen_local_key
         ```
-    *   Windows (PowerShell):
+    *   Example for Windows (PowerShell):
         ```bash
-        $env:SECRET_KEY="a_very_secret_and_random_key_should_go_here"
+        $env:SECRET_KEY="your_chosen_local_key"
         ```
-    **Note:** For production, use a proper method for managing secrets.
+    Choose any string you like for local runs; it doesn't need to be cryptographically complex for this purpose.
 
 5.  **Run the application:**
     ```bash
