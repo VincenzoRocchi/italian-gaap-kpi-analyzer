@@ -19,13 +19,6 @@ jobs:
             package_cmd: Compress-Archive -Path dist/kpi_cee -DestinationPath kpi_cee-windows.zip
             packaged_asset: kpi_cee-windows.zip
             shell_type: powershell
-          - os_name: macos
-            os_platform: macos-latest # This is typically x86_64, runs on M1/M2 via Rosetta 2
-            asset_file_name: kpi_cee-macos
-            pyinstaller_output: kpi_cee/kpi_cee # App bundle or executable in folder
-            package_cmd: zip -r kpi_cee-macos.zip dist/kpi_cee 
-            packaged_asset: kpi_cee-macos.zip
-            shell_type: bash
           - os_name: linux
             os_platform: ubuntu-latest
             asset_file_name: kpi_cee-linux
@@ -105,12 +98,6 @@ jobs:
         1. Download `kpi_cee-windows.zip`.
         2. Extract the archive.
         3. Double-click `kpi_cee.exe`. Your browser should open automatically.
-
-        **macOS (Intel/Rosetta 2):**
-        1. Download `kpi_cee-macos.zip`.
-        2. Extract the archive. Navigate to the folder.
-        3. Make it executable: `chmod +x kpi_cee/kpi_cee`
-        4. Run: `./kpi_cee/kpi_cee`. Your browser should open.
 
         **Linux:**
         1. Download `kpi_cee-linux.tar.gz`.

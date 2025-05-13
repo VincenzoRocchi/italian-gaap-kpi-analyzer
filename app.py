@@ -28,6 +28,10 @@ app.secret_key = os.environ.get('SECRET_KEY', os.urandom(24))
 def inject_now():
     return {'now': datetime.utcnow()} # Use utcnow for consistency
 
+@app.context_processor
+def inject_app_version():
+    return {'app_version': "0.2.8 Beta"} # Inject app version
+
 @app.after_request
 def add_security_headers(response):
     """Add basic security headers to all responses."""

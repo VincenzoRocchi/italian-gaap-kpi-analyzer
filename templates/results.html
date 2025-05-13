@@ -18,24 +18,29 @@
                 {# Iterate over selected_kpi_keys to potentially maintain order #}
                 {% for kpi_key in selected_kpi_keys %}
                     {% if kpi_key in results %} {# Check if result exists for the selected KPI #}
-                    {% set result_value = results[kpi_key]['value'] %}
-                    {% set kpi_details = available_kpis[kpi_key] %}
+                    {% set kpi_result = results[kpi_key] %}
+                    {% set kpi_details = kpi_result.details %}
                     <div class="col">
                         <div class="card h-100 shadow-sm border-light-subtle"> {# Use subtle border #}
-                            <div class="card-header bg-primary bg-opacity-75 text-white"> {# Slightly transparent header #}
-                               {{ kpi_details.name_display }}
+                            <div class="card-header {{ 'bg-secondary' if kpi_result.status == 'error' else 'bg-primary' }} bg-opacity-75 text-white"> {# Slightly transparent header #}
+                                {{ kpi_details.name_display }}
                             </div>
                             <div class="card-body">
                                 <div class="d-md-flex justify-content-between align-items-start"> {# Flex container, responsive #}
                                     <div class="me-md-3 mb-2 mb-md-0 text-center text-md-start"> {# Left part: Value - centered on small screens #}
                                         <h6 class="card-title mb-1">Valore:</h6>
-                                        <span class="{{ 'bg-danger' if result_value is not number else 'bg-success' }} text-white fs-4 d-inline-block p-2 rounded shadow-sm"> {# Enhanced badge style #}
-                                            {% if result_value is number %}
-                                                {{ "%.2f"|format(result_value) }}
-                                                {# Basic check if KPI name suggests percentage or common KPI keys #}
-                                                {% if 'percentage' in kpi_details.name_display|lower or 'percentuale' in kpi_details.name_display|lower or kpi_key in ['roe', 'roi', 'ros'] %} % {% endif %}
+                                        <span class="{{ 'bg-warning' if kpi_result.status == 'error' else 'bg-success' }} text-white fs-4 d-inline-block p-2 rounded shadow-sm">
+                                            {% if kpi_result.status == 'ok' and kpi_result.value is number %}
+                                                {{ "%.2f"|format(kpi_result.value) }}
+                                                {% if kpi_details.is_ratio is defined and kpi_details.is_ratio == false %} {# Assuming a flag 'is_ratio' in kpi_details #}
+                                                    {# No percentage for absolute values like Working Capital #}
+                                                {% elif 'percentage' in kpi_details.name_display|lower or 'percentuale' in kpi_details.name_display|lower or kpi_key in ['roe', 'roi', 'ros', 'asset_rigidity_index', 'asset_elasticity_index', 'tax_social_debt_on_assets_ratio', 'intangible_assets_ratio', 'financial_assets_ratio', 'net_working_capital_ratio'] %}
+                                                    %
+                                                {% endif %}
+                                            {% elif kpi_result.status == 'error' %}
+                                                <small>{{ kpi_result.message|default('N/D') }}</small>
                                             {% else %}
-                                                {{ result_value }} {# Display error messages like 'Dati insufficienti' #}
+                                                N/D {# Fallback for unexpected cases #}
                                             {% endif %}
                                         </span>
                                     </div>
