@@ -5,7 +5,7 @@
 >>>>>>> legacy/flask-web
 
 <!-- Badges: License, Python Version, Flask Version -->
-![License](https://img.shields.io/github/license/VincenzoRocchi/kpi_cee) <!-- Replace with your actual repo path if different -->
+![License](https://img.shields.io/github/license/VincenzoRocchi/kpi_cee)
 ![Python Version](https://img.shields.io/badge/python-3.12-blue)
 ![Flask Version](https://img.shields.io/badge/flask-3.1.0-blue)
 
