@@ -1,7 +1,7 @@
 [project]
 name = "kpi-cee"
-version = "0.2.0"
-description = "Add your description here"
+version = "0.2.8"
+description = "A desktop application to calculate Key Performance Indicators (KPIs) from Italian GAAP-compliant financial statements.""
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
