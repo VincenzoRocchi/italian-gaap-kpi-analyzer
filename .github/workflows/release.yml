@@ -108,10 +108,10 @@ jobs:
 
         **macOS (Intel/Rosetta 2):**
         1. Download \`kpi_cee-macos-${TAG}.zip\`.
-        2. Extract the archive. The file inside is \`kpi_cee\`.
-        3. Open Terminal, navigate to the folder where you extracted \`kpi_cee\`.
-        4. Make it executable: \`chmod +x kpi_cee\`
-        5. Run it: \`./kpi_cee\` (or double-click \`kpi_cee\`). Your browser should open.
+        2. Extract the archive. The folder inside is \`kpi_cee\` (which may contain \`kpi_cee.app\`).
+        3. Open Terminal, navigate to the folder where you extracted \`kpi_cee\` (or the \`.app\` bundle).
+        4. Make it executable using \`chmod +x kpi_cee\`. For .app bundles, the main executable is inside, e.g., \`kpi_cee.app/Contents/MacOS/kpi_cee\`.
+        5. Run it: \`./kpi_cee\` (or double-click \`kpi_cee.app\`). Your browser should open.
            *If you double-click and see an "unidentified developer" warning:*
            * Right-click (or Ctrl-click) the \`kpi_cee\` file and select "Open". You might need to confirm again.
            * Or, go to System Settings > Privacy & Security, scroll down, and you should see an option to "Open Anyway".
