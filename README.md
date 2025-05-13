@@ -97,8 +97,8 @@ For more installation options, see the [official `uv` installation guide](https:
         # or if they are removed from pyproject.toml's main dependencies in the future.
         ```
 
-5.  **Set the `SECRET_KEY` environment variable (Optional for Local Development):**
-    Flask sessions use a `SECRET_KEY`. The application will generate a temporary one if `SECRET_KEY` is not set in your environment. For persistent sessions or if you prefer to set it explicitly for local development:
+5.  **Set `SECRET_KEY` (Rarely Needed for Local Use):**
+    Flask uses a `SECRET_KEY` for session management. This application will automatically generate a temporary key if one isn't set, which is perfectly fine for its typical local, in-memory operation. If you have a specific need to set it (e.g., advanced session testing), you can do so:
     *   macOS/Linux (in your terminal):
         ```bash
         export SECRET_KEY='my_local_dev_key'
@@ -107,7 +107,6 @@ For more installation options, see the [official `uv` installation guide](https:
         ```bash
         set SECRET_KEY=my_local_dev_key
         ```
-    (This key is for session security; it doesn't need to be overly complex for local runs.)
 
 6.  **Run the application:**
     ```bash
