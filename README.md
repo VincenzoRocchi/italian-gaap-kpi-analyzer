@@ -14,84 +14,42 @@ KPI CEE helps financial analysts, accountants, and business owners analyze finan
 ## Features
 
 - **Italian GAAP Compliance**: Structured around the official CEE format (Art. 2424 Codice Civile)
-- **Multiple KPI Calculations**:
-  - Current Ratio (Indice di Liquidità Corrente)
-  - Quick Ratio (Indice di Liquidità Immediata)
-  - Cash Ratio (Indice di Cassa)
-  - Debt to Equity Ratio (Rapporto Debiti/Patrimonio Netto)
-  - Debt Ratio (Rapporto di Indebitamento Totale)
-  - Working Capital (Capitale Circolante Netto)
+- **Multiple KPI Calculations** (Current Ratio, Quick Ratio, Debt to Equity, etc.)
 - **Intuitive Web Interface**: Select KPIs and input financial data through a clean, responsive UI
 - **Detailed Results**: View calculated KPIs with interpretations and reference ranges
 
-## Installation
+## Documentation
 
-Ensure you have Python 3.12 or higher installed.
+For detailed information on installation, usage, building from source, and project structure, please see the **[Full Documentation](./docs/README.md)**.
 
-```bash
-# Clone the repository
-git clone https://github.com/yourusername/kpi_cee.git # Replace with your actual username/repo
-cd kpi_cee
+## Installation and Usage
 
-# Set up a Python virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows use: venv\Scripts\activate
+For quick installation and usage instructions, please refer to the **[Installation Guide](./docs/01_installation.md)**.
 
-# Install dependencies
-pip install -r requirements.txt
+## Downloading and Running Pre-built Executables
 
-# IMPORTANT: Set the Flask Secret Key
-# For development, you can set it in your terminal:
-# On Linux/macOS:
-# export SECRET_KEY='your_very_secret_random_key_here'
-# On Windows (Command Prompt):
-# set SECRET_KEY=your_very_secret_random_key_here
-# On Windows (PowerShell):
-# $env:SECRET_KEY="your_very_secret_random_key_here"
-# For production, use a proper secrets management solution.
-```
+For users who do not want to install Python or manage dependencies, pre-built executables are available for Windows, macOS, and Linux.
 
-## Usage
+1.  **Go to the [Releases Page](https://github.com/yourusername/kpi_cee/releases)** (replace `yourusername/kpi_cee` with your actual repository path).
+2.  Find the latest release and download the appropriate archive file for your operating system:
+    *   **Windows:** `kpi_cee-windows.zip` (containing the `kpi_cee` folder)
+    *   **macOS:** `kpi_cee-macos.zip` (containing the `kpi_cee` folder, which might be `kpi_cee.app`)
+    *   **Linux:** `kpi_cee-linux.tar.gz` (containing the `kpi_cee` folder)
+3.  **Extract the downloaded archive.** This will create a `kpi_cee` folder.
+4.  **Run the executable** located inside the extracted `kpi_cee` folder:
+    *   **Windows:** Double-click `kpi_cee.exe` (inside the `kpi_cee` folder).
+    *   **macOS:** 
+        1.  Open the extracted `kpi_cee` folder. You should find `kpi_cee` (or `kpi_cee.app`).
+        2.  If it's not an `.app` bundle, or if you prefer the terminal: Open Terminal, navigate to the extracted `kpi_cee` folder.
+        3.  Make the file executable (if needed): `chmod +x kpi_cee`
+        4.  Run: `./kpi_cee` or double-click the `kpi_cee` or `kpi_cee.app` file.
+        5.  If you see an "unidentified developer" warning when double-clicking: Right-click (or Ctrl-click) the file, select "Open", and confirm. Alternatively, go to System Settings > Privacy & Security, scroll down, and look for an "Open Anyway" button.
+    *   **Linux:** 
+        1.  Open Terminal, navigate to the extracted `kpi_cee` folder.
+        2.  Make the file executable: `chmod +x kpi_cee`
+        3.  Run: `./kpi_cee`
 
-```bash
-# Ensure your virtual environment is activated and SECRET_KEY is set
-# Then run the application:
-python app.py
-```
-
-Then open your browser and navigate to `http://127.0.0.1:5000/`
-
-1.  Select the KPIs you want to calculate.
-2.  Enter your financial statement data in the input form.
-3.  View and interpret the calculated KPIs with provided guidance.
-
-## Project Structure (Version 0.2.0)
-
-```
-kpi_cee/
-├── app.py                     # Main Flask application runner and routes
-├── app_logic/                 # Core application logic and data
-│   ├── __init__.py            # Makes app_logic a Python package
-│   ├── calculator.py          # KPI calculation functions
-│   ├── constants.py           # Data definitions (balance sheet, KPIs, etc.)
-│   └── validators.py          # Input validation functions
-├── static/                    # Static assets (CSS, JS, images)
-│   └── css/
-│       └── custom.css
-├── templates/                 # HTML templates for the web interface
-│   ├── base.html              # Base template with common layout
-│   ├── input.html             # Financial data input form
-│   ├── results.html           # KPI results display
-│   ├── select_kpi.html        # KPI selection page
-│   └── partials/              # (If you add partial templates)
-├── tests/                     # Test suite for the application
-│   ├── __init__.py            # Makes tests a Python package
-│   └── test_calculator.py     # Tests for KPI calculations
-├── pyproject.toml             # Project metadata and dependencies (PEP 517/518)
-├── requirements.txt           # Pinned dependencies for deployment/reproducibility
-└── README.md                  # This file
-# Recommended: Add .gitignore, LICENSE
-```
+The application should open in your default web browser automatically.
 
 ## Dependencies
 
@@ -106,20 +64,39 @@ This project is licensed under the terms in the `LICENSE` file (to be added - e.
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request. Consider creating an issue first to discuss significant changes.
+Contributions are welcome! Please see the [Contributing Guide](./docs/04_contributing.md) for more details.
 
 ## Development
 
-To set up a development environment:
+To set up a development environment, please refer to the guides in our [Documentation](./docs/README.md), particularly:
+*   [Installation (Running from Source)](./docs/01_installation.md#option-2-running-from-source-code)
+*   [Building from Source](./docs/02_building_from_source.md)
 
 ```bash
-# (After cloning and creating/activating virtual environment as per Installation)
-# Install development dependencies (if you define them in pyproject.toml or have a separate dev-requirements.txt)
-# For example, ensure pytest is installed (it's now in requirements.txt):
-# pip install pytest 
-
+# (After cloning and creating/activating virtual environment as per Installation docs)
 # Run tests:
 pytest
 ```
 
+## CI/CD Pipeline (Automated Releases)
+
+This project uses GitHub Actions to automate the building of executables and the creation of GitHub Releases. For more details, see the [workflow file](./.github/workflows/release.yml) and the [release notes generation script](./.github/workflows/release.yml) within the workflow.
+
+**How to Create a New Release (and trigger the pipeline):**
+
+1.  Ensure all your code changes are committed and pushed to your main branch.
+2.  Create a new tag for your release. It's good practice to follow semantic versioning (e.g., `v0.3.0`).
+    ```bash
+    # Example for version 0.3.0
+    git tag v0.3.0
+    ```
+3.  Push the tag to GitHub:
+    ```bash
+    git push origin v0.3.0 
+    # Or push all tags: git push origin --tags
+    ```
+This will trigger the GitHub Actions workflow, which will build the executables and publish them in a new release on your GitHub repository's "Releases" page.
+
 ## Roadmap / Future Enhancements
+
+(To be defined - consider adding items like: more KPIs, data import/export, charts, user accounts, etc.)

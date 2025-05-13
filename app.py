@@ -167,4 +167,12 @@ def calculate():
     )
 
 if __name__ == '__main__':
-    app.run(debug=True) 
+    import webbrowser
+    # Try to open the browser only when running as the main script (and thus likely as an executable)
+    # This avoids opening the browser during Flask's auto-reloader development cycles.
+    if not os.environ.get("WERKZEUG_RUN_MAIN"): # WERKZEUG_RUN_MAIN is set by Flask reloader
+        try:
+            webbrowser.open_new_tab('http://127.0.0.1:5000')
+        except Exception as e:
+            print(f"Could not open browser: {e}") # Or log this appropriately
+    app.run(debug=False, use_reloader=False, host='0.0.0.0', port=5000) 

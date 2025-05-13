@@ -1,0 +1,153 @@
+name: Build and Release Executables
+
+on:
+  push:
+    tags:
+      - 'v*.*.*' # Trigger on tags like v0.2.1, v1.0.0
+
+jobs:
+  build:
+    name: Build on ${{ matrix.os_name }}
+    runs-on: ${{ matrix.os_platform }}
+    strategy:
+      matrix:
+        include:
+          - os_name: windows
+            os_platform: windows-latest
+            asset_file_name: kpi_cee-windows # Base name for the final asset
+            pyinstaller_output: kpi_cee\\\\kpi_cee.exe # Path to exe in onedir
+            package_cmd: Compress-Archive -Path dist/kpi_cee -DestinationPath kpi_cee-windows.zip
+            packaged_asset: kpi_cee-windows.zip
+            shell_type: powershell
+          - os_name: macos
+            os_platform: macos-latest # This is typically x86_64, runs on M1/M2 via Rosetta 2
+            asset_file_name: kpi_cee-macos
+            pyinstaller_output: kpi_cee/kpi_cee # App bundle or executable in folder
+            package_cmd: zip -r kpi_cee-macos.zip dist/kpi_cee 
+            packaged_asset: kpi_cee-macos.zip
+            shell_type: bash
+          - os_name: linux
+            os_platform: ubuntu-latest
+            asset_file_name: kpi_cee-linux
+            pyinstaller_output: kpi_cee/kpi_cee # Executable in folder
+            package_cmd: tar -czvf kpi_cee-linux.tar.gz -C dist kpi_cee
+            packaged_asset: kpi_cee-linux.tar.gz
+            shell_type: bash
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12' # Match your project's Python version
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        # PyInstaller is already in requirements.txt
+
+    - name: Build with PyInstaller
+      run: |
+        pyinstaller --name kpi_cee \\
+                    --onedir \\
+                    --noconsole \\
+                    --add-data "templates${{ matrix.os_name == 'windows' && ';' || ':' }}templates" \\
+                    --add-data "static${{ matrix.os_name == 'windows' && ';' || ':' }}static" \\
+                    app.py
+      shell: ${{ matrix.shell_type }}
+
+    - name: Package executable
+      run: ${{ matrix.package_cmd }}
+      shell: ${{ matrix.shell_type }}
+
+    - name: Upload distributable as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ matrix.asset_file_name }} # e.g., kpi_cee-windows-v0.3.0
+        path: ${{ matrix.packaged_asset }} # e.g., kpi_cee-windows.zip
+
+  release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    needs: build # Run after all build jobs are successful
+    permissions:
+      contents: write # Required for gh release create/upload
+
+    steps:
+    - name: Checkout code # Needed for gh to know the repo, and for release notes if local
+      uses: actions/checkout@v4
+
+    - name: Download all build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: artifacts # Download all artifacts to a directory named 'artifacts'
+
+    - name: List downloaded artifacts (for debugging)
+      run: ls -R artifacts
+
+    - name: Create Release Notes and Upload Assets with GitHub CLI
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        TAG: ${{ github.ref_name }}
+      run: |
+        # Create release notes file
+        cat <<EOF > release_notes.md
+        ## Release ${TAG}
+
+        Automated release for KPI CEE version ${TAG}.
+
+        Download the executable for your operating system below.
+
+        ### How to Run:
+
+        **Windows:**
+        1. Download \`kpi_cee-windows-${TAG}.zip\`.
+        2. Extract the archive.
+        3. Double-click \`kpi_cee.exe\`. Your browser should open automatically to the application.
+
+        **macOS (Intel/Rosetta 2):**
+        1. Download \`kpi_cee-macos-${TAG}.zip\`.
+        2. Extract the archive. The file inside is \`kpi_cee\`.
+        3. Open Terminal, navigate to the folder where you extracted \`kpi_cee\`.
+        4. Make it executable: \`chmod +x kpi_cee\`
+        5. Run it: \`./kpi_cee\` (or double-click \`kpi_cee\`). Your browser should open.
+           *If you double-click and see an "unidentified developer" warning:*
+           * Right-click (or Ctrl-click) the \`kpi_cee\` file and select "Open". You might need to confirm again.
+           * Or, go to System Settings > Privacy & Security, scroll down, and you should see an option to "Open Anyway".
+
+        **Linux:**
+        1. Download \`kpi_cee-linux-${TAG}.tar.gz\`.
+        2. Extract the archive: \`tar -xzvf kpi_cee-linux-${TAG}.tar.gz\`. This usually creates a \`kpi_cee\` file.
+        3. Open Terminal, navigate to the folder where you extracted the file.
+        4. Make it executable: \`chmod +x kpi_cee\`
+        5. Run it: \`./kpi_cee\`. Your browser should open automatically to the application.
+
+        ---
+        Files in this release:
+        EOF
+
+        # Prepare array for gh release upload
+        declare -a upload_files=()
+
+        echo "" >> release_notes.md
+        echo "Checksums (SHA256):" >> release_notes.md
+        # Artifacts are downloaded into subdirectories named after the artifact name.
+        # e.g., artifacts/kpi_cee-windows-v0.3.0/kpi_cee-windows.zip
+        find artifacts -type f -print0 | while IFS= read -r -d $'\0' file_path; do
+          file_name=\$(basename "\$file_path")
+          # Add to release notes with just the file name
+          sha256sum "\$file_path" | awk -v name="\$file_name" '{print "  - \`" name "\`:", $1}' >> release_notes.md
+          # Add to upload list with its full path from download
+          upload_files+=("\$file_path")
+        done
+
+        # Create the release and upload all files
+        # The `gh release create` command will use the commit message of the tag for the main body if not overridden by --notes or --notes-file
+        # Using --notes-file provides more control.
+        gh release create ${TAG} \\
+          --title "Release ${TAG}" \\
+          --notes-file release_notes.md \\
+          "\${upload_files[@]}" # Upload all collected files 
