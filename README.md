@@ -28,7 +28,7 @@ There are two main ways to use KPI CEE:
 
 Download ready-to-run executables for your operating system.
 
-1.  Go to the **[Releases Page](https://github.com/yourusername/kpi_cee/releases)** (replace `yourusername/kpi_cee` with your actual repository path).
+1.  Go to the **[Releases Page](https://github.com/VincenzoRocchi/kpi_cee/releases)**
 2.  Download the archive for your OS (e.g., `kpi_cee-windows.zip`).
 3.  Extract the archive.
 4.  Run the `kpi_cee` executable (or `kpi_cee.app` on macOS) found inside the extracted folder.
