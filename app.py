@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, session, redirect, url_for, f
 import os
 from datetime import datetime
 import json
+import collections # Import collections for defaultdict
 
 # Import from our modules
 from app_logic.constants import (
@@ -41,7 +42,24 @@ def index():
     session.pop('required_positions', None)
     session.pop('selected_kpis', None)
     session.pop('calculated_kpis', None)
-    return render_template('select_kpi.html', available_kpis=AVAILABLE_KPIS)
+
+    # Group KPIs by category
+    grouped_kpis = collections.defaultdict(dict)
+    for key, kpi_details in AVAILABLE_KPIS.items():
+        category = kpi_details.get('category_display', 'Altro') # Default category if not specified
+        grouped_kpis[category][key] = kpi_details
+    
+    # Sort categories if desired (e.g., by a predefined order or alphabetically)
+    # For now, using the order they appear based on AVAILABLE_KPIS iteration and defaultdict behavior.
+    # If a specific order is needed, we can define an order list and sort by it.
+    # Example: desired_order = ["Indici di Liquidità", "Capitale Circolante", ...]
+    # sorted_grouped_kpis = {cat: grouped_kpis[cat] for cat in desired_order if cat in grouped_kpis}
+    # # Add any categories not in desired_order at the end
+    # for cat in grouped_kpis:
+    #     if cat not in sorted_grouped_kpis:
+    #         sorted_grouped_kpis[cat] = grouped_kpis[cat]
+
+    return render_template('select_kpi.html', grouped_kpis=grouped_kpis)
 
 @app.route('/input', methods=['GET', 'POST'])
 def input_required_fields():

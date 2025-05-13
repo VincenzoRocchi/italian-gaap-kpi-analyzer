@@ -9,36 +9,42 @@
         <hr>
         <p class="text-muted mb-4">Scegli uno o più indicatori cliccando sulle relative schede. Verranno richiesti solo i dati necessari per i calcoli selezionati.</p>
 
-        {# KPI Tiles using Bootstrap Grid and Cards #}
-        <div class="row g-3 mb-4 kpi-selection-grid">
-            {% for key, kpi in available_kpis.items() %}
-            <div class="col-md-6 col-lg-4">
-                <div class="card kpi-tile h-100"> {# Add h-100 for equal height cards #}
-                    <input class="form-check-input kpi-checkbox" 
-                           type="checkbox" 
-                           name="kpi_keys" 
-                           value="{{ key }}" 
-                           id="kpi-{{ key }}">
-                    <div class="card-body d-flex flex-column"> 
-                        <label class="flex-grow-1" 
-                               for="kpi-{{ key }}"
-                               data-bs-toggle="tooltip" 
-                               data-bs-html="true" 
-                               data-bs-placement="top"
-                               title="<strong class='text-primary'>{{ kpi.name_display }}</strong><br>
-                                      <strong>Formula:</strong> {{ kpi.tooltip_info.formula_display }}<br>
-                                      <strong>Range Ottimale:</strong> {{ kpi.tooltip_info.optimal_range_cee }}<br>
-                                      <strong>Interpretazione:</strong> {{ kpi.tooltip_info.interpretation_notes }}">
-                            <h5 class="card-title mb-2">
-                                {{ kpi.name_display.replace('Indice di ', '') }} 
-                            </h5>
-                            <p class="card-text small text-muted flex-grow-1">{{ kpi.description_short }}</p>
-                        </label>
+        {# KPI Tiles using Bootstrap Grid and Cards - Now Grouped #}
+        {% for category_name, kpis_in_category in grouped_kpis.items() %}
+            <h3 class="mt-4 mb-3">{{ category_name }}</h3>
+            <div class="row g-3 mb-4 kpi-selection-grid">
+                {% for key, kpi in kpis_in_category.items() %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card kpi-tile h-100"> 
+                        <input class="form-check-input kpi-checkbox" 
+                               type="checkbox" 
+                               name="kpi_keys" 
+                               value="{{ key }}" 
+                               id="kpi-{{ key }}">
+                        <div class="card-body d-flex flex-column"> 
+                            <label class="flex-grow-1" 
+                                   for="kpi-{{ key }}"
+                                   data-bs-toggle="tooltip" 
+                                   data-bs-html="true" 
+                                   data-bs-placement="top"
+                                   title="<strong class='text-primary'>{{ kpi.name_display }} {% if kpi.is_crisis_law_kpi %}(CCI){% endif %}</strong><br>
+                                          <strong>Formula:</strong> {{ kpi.tooltip_info.formula_display }}<br>
+                                          <strong>Range Ottimale:</strong> {{ kpi.tooltip_info.optimal_range_cee }}<br>
+                                          <strong>Interpretazione:</strong> {{ kpi.tooltip_info.interpretation_notes }}">
+                                <h5 class="card-title mb-2 d-flex justify-content-between align-items-start">
+                                    <span>{{ kpi.name_display.replace('Indice di ', '') }}</span>
+                                    {% if kpi.is_crisis_law_kpi %}
+                                        <span class="badge bg-warning text-dark ms-2" style="font-size: 0.6rem; padding: 0.2em 0.4em;" title="Indicatore Codice Crisi Impresa">CCI</span>
+                                    {% endif %}
+                                </h5>
+                                <p class="card-text small text-muted flex-grow-1">{{ kpi.description_short }}</p>
+                            </label>
+                        </div>
                     </div>
                 </div>
+                {% endfor %}
             </div>
-            {% endfor %}
-        </div>
+        {% endfor %}
 
         <hr class="my-4">
         <div class="d-flex justify-content-end mb-4">
