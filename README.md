@@ -1,4 +1,4 @@
-# KPI CEE (KPI Calculator for Italian Financial Statements) - Beta Version 0.2.0
+# KPI CEE (KPI Calculator for Italian Financial Statements) - Beta Version 0.2.x
 
 <!-- Badges: License, Python Version, Flask Version -->
 ![License](https://img.shields.io/github/license/VincenzoRocchi/kpi_cee) <!-- Replace with your actual repo path if different -->
