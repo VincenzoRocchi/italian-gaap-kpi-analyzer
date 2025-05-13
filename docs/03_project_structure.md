@@ -34,8 +34,8 @@ kpi_cee/
 ├── pyproject.toml             # Project metadata and dependencies (PEP 517/518)
 ├── requirements.txt           # Pinned dependencies for deployment/reproducibility
 ├── README.md                  # Main project README
-└── .gitignore                 # Specifies intentionally untracked files that Git should ignore
-# Recommended: Add LICENSE
+├── .gitignore                 # Specifies intentionally untracked files that Git should ignore
+└── LICENSE                    # Project license information
 ```
 
 ## Key Components:

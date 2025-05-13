@@ -99,7 +99,7 @@ For more in-depth information, including project structure and contribution guid
 
 ## License
 
-This project is licensed under the terms in the `LICENSE` file (e.g., MIT License - to be added). See `LICENSE` for more information.
+This project is licensed under the terms detailed in the [LICENSE](./LICENSE) file.
 
 ## Contributing
 
