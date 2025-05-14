@@ -1,4 +1,4 @@
-# KPI CEE (KPI Calculator for Italian Financial Statements) - Version 0.3.x
+# italian-gaap-kpi-analyzer (KPI Calculator for Italian Financial Statements) - Version 0.3.x
 
 <!-- Badges: License, Python Version, Flask Version -->
 ![License](https://img.shields.io/github/license/VincenzoRocchi/kpi_cee)
