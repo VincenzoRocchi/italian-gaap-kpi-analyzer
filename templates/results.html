@@ -54,8 +54,35 @@
                                         {% endif %}
                                     </div>
                                 </div>
+                            </div> {# End card-body #}
+
+                            {# NEW: Hidden by default, shown only for print-full-report. Correctly placed after card-body #}
+                            {% set kpi_details_print = results[kpi_key].details %} {# Explicitly set for this block #}
+                            <div class="kpi-print-input-details card-footer bg-light border-top-dashed py-2 px-3">
+                                <h6 class="kpi-print-input-details-title mb-2">Dati di input per {{ kpi_details_print.name_display }}:</h6>
+                                <div class="kpi-print-input-grid-container">
+                                    {% if kpi_key in input_data_by_kpi and input_data_by_kpi[kpi_key] and input_data_by_kpi[kpi_key]|length > 0 %}
+                                        {% for pos_str_key, value in input_data_by_kpi[kpi_key].items()|sort %}
+                                            {% set pos_int = pos_str_key|int %}
+                                            <div class="kpi-print-input-item">
+                                                <span class="kpi-print-input-pos-name">Pos. {{ pos_int }}: {{ position_names.get(pos_int, 'Nome non trovato') }}</span>
+                                                <span class="kpi-print-input-value badge bg-white text-dark border rounded-pill fw-normal py-1 px-2">
+                                                    {% if value is number %}
+                                                        {{ "%.2f"|format(value) }}
+                                                    {% elif value is none %}
+                                                        N/D
+                                                    {% else %}
+                                                        {{ value }}
+                                                    {% endif %}
+                                                </span>
+                                            </div>
+                                        {% endfor %}
+                                    {% else %}
+                                        <p class="kpi-print-input-item-full-width text-muted"><small>Nessun dato specifico richiesto/utilizzato per questo KPI.</small></p>
+                                    {% endif %}
+                                </div>
                             </div>
-                        </div>
+                        </div> {# End card h-100 shadow-sm #}
                     </div>
                     {% endif %}
                 {% else %}
@@ -69,7 +96,7 @@
         </div>
 
         <!-- Right Column: Input Data Summary & Balance Check -->
-        <div class="col-lg-5 ps-lg-4">
+        <div class="col-lg-5 ps-lg-4"> {# Removed no-print from here #}
              <div class="card shadow-sm border-light-subtle"> {# Wrap right column content in a card #}
                 <div class="card-body">
                     <h2 class="fs-5 card-title mb-3"><i class="bi bi-clipboard-data me-2"></i>Dati e Quadratura</h2>
@@ -90,7 +117,7 @@
                     {% endif %}
 
                     <h3 class="mt-4 fs-6">Dati Inseriti per KPI</h3> {# Smaller heading #}
-                    <div class="accordion accordion-flush mt-2" id="inputDataAccordion"> {# Flush accordion #}
+                    <div class="accordion accordion-flush mt-2 original-kpi-input-accordion" id="inputDataAccordion"> {# Added original-kpi-input-accordion class #}
                         {# Iterate over selected_kpi_keys to maintain order and relevance #}
                         {% for kpi_key in selected_kpi_keys|sort %}
                             {% if kpi_key in input_data_by_kpi and input_data_by_kpi[kpi_key] %} {# Check if data exists for this KPI #}
@@ -145,9 +172,15 @@
     {# Buttons Row - Placed below the main content, outside the cards #}
     <hr class="my-4">
     <div class="d-flex justify-content-end mb-4">
-        <a href="{{ url_for('input_required_fields') }}" class="btn btn-secondary me-2">
+        <a href="{{ url_for('input_required_fields') }}" class="btn btn-secondary me-2 no-print"> {# Added no-print class here #}
             <i class="bi bi-pencil-square"></i> Modifica Dati
         </a>
+        <button onclick="printSummary();" class="btn btn-info me-2 no-print"> 
+            <i class="bi bi-printer"></i> Stampa Riepilogo KPI
+        </button>
+        <button onclick="printFullReport();" class="btn btn-success me-2 no-print"> 
+            <i class="bi bi-file-earmark-text"></i> Stampa Report Completo
+        </button>
         {# Optionally add a back to selection button here if needed #}
         {# <a href="{{ url_for('index') }}" class="btn btn-secondary">Indietro (Selezione KPI)</a> #}
     </div>
@@ -156,5 +189,38 @@
 
 {% block scripts %}
 {{ super() }}
-{# Add specific scripts for this page if needed #}
+<script>
+function printSummary() {
+    document.body.classList.add('print-summary');
+    document.body.classList.remove('print-full-report');
+    window.print();
+    // Use a timeout to remove the class after the print dialog has likely processed
+    setTimeout(() => {
+        document.body.classList.remove('print-summary');
+    }, 1000);
+}
+
+function printFullReport() {
+    document.body.classList.remove('print-summary');
+    document.body.classList.add('print-full-report');
+    
+    // For the full report, we want accordions in the details section to appear expanded.
+    // The CSS will handle forcing them open, but we can ensure buttons reflect this visually if needed.
+    const accordionButtons = document.querySelectorAll('#inputDataAccordion .accordion-button');
+    accordionButtons.forEach(button => {
+        if (document.body.classList.contains('print-full-report')) {
+            // Optional: Visually change button state for print if CSS doesn't fully override icon
+            // button.classList.remove('collapsed'); 
+            // button.setAttribute('aria-expanded', 'true');
+        }
+    });
+    
+    window.print();
+    setTimeout(() => {
+        document.body.classList.remove('print-full-report');
+        // Optional: Revert button state if changed above
+        // accordionButtons.forEach(button => { ... }); 
+    }, 1000);
+}
+</script>
 {% endblock %}

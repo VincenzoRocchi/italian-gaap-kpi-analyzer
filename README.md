@@ -1,4 +1,4 @@
-# KPI CEE (KPI Calculator for Italian Financial Statements) - Version 0.2.8
+# KPI CEE (KPI Calculator for Italian Financial Statements) - Version 0.3.x
 
 <!-- Badges: License, Python Version, Flask Version -->
 ![License](https://img.shields.io/github/license/VincenzoRocchi/kpi_cee)
@@ -19,6 +19,7 @@ This is an open-source project, free to use, modify, and distribute. Use it as a
 - **Multiple KPI Calculations**: Including Current Ratio, Quick Ratio, Debt to Equity, and more.
 - **Intuitive Web Interface**: Easily select KPIs and input financial data.
 - **Detailed Results**: View calculated KPIs with interpretations.
+- **PDF Export**: Print KPI results (summary or full report with input data) to PDF directly from your browser.
 
 ## Getting Started
 

@@ -1,4 +1,4 @@
-# Project Structure (Version 0.2.0)
+# Project Structure (Version 0.3.x Beta)
 
 This document outlines the main directories and files in the KPI CEE project.
 

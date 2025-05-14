@@ -30,7 +30,7 @@ def inject_now():
 
 @app.context_processor
 def inject_app_version():
-    return {'app_version': "0.2.8 Beta"} # Inject app version
+    return {'app_version': "0.3.0 Beta"} # Inject app version
 
 @app.after_request
 def add_security_headers(response):
