@@ -81,10 +81,9 @@ KPI_REQUIREMENTS = {
         [49, 50] + 
         [79, 80, 81, 82, 83, 84, 85, 86, 87, 88], 
     'quick_ratio': 
-        [39, 40, 41, 42, 43, 44, 45] + 
-        [46, 47, 48] + 
-        [49, 50] + 
-        [79, 80, 81, 82, 83, 84, 85, 86, 87, 88], 
+        [39, 40, 41, 42, 43, 45] +  # C.II Crediti, EXCLUDING 44 (Deferred Tax Assets)
+        [49, 50] +                    # C.IV Cash and cash equivalents
+        [79, 80, 81, 82, 83, 84, 85, 86, 87, 88], # Current Liabilities
     'cash_ratio': 
         [49, 50] + 
         [79, 80, 81, 82, 83, 84, 85, 86, 87, 88], 
@@ -175,6 +174,20 @@ AVAILABLE_KPIS = {
             'required_inputs_display': "Fondi rischi e oneri, Debiti (L/T e B/T), Risconti Passivi, Patrimonio Netto (Capitale, Riserve, Risultato)"
         }
     },
+    'debt_to_equity_excl_tfr': {
+        'name_display': "Rapporto Debiti/Patrimonio Netto (escl. TFR)",
+        'description_short': "Indica il rapporto tra il finanziamento tramite terzi (escluso TFR) e il capitale proprio.",
+        'is_ratio': True,
+        'category_display': "Struttura Finanziaria e Leva",
+        'is_crisis_law_kpi': False,
+        'tooltip_info': {
+            'full_explanation': "Misura la leva finanziaria escludendo il Trattamento di Fine Rapporto (TFR) dai debiti totali. Offre una visione alternativa della struttura del debito.",
+            'formula_display': "(Totale Passività - TFR) / Patrimonio Netto",
+            'optimal_range_cee': "Simile al D/E standard, ma valori leggermente inferiori. Varia per settore.",
+            'interpretation_notes': "Un rapporto più basso è generalmente preferibile. Utile per analisti che considerano il TFR una passività con caratteristiche diverse dal debito finanziario.",
+            'required_inputs_display': "Fondi rischi e oneri, Debiti (L/T e B/T escluso TFR), Risconti Passivi, Patrimonio Netto"
+        }
+    },
     'debt_ratio': {
         'name_display': "Rapporto di Indebitamento Totale",
         'description_short': "Indica la percentuale di attivi finanziati tramite debito.",
@@ -187,6 +200,20 @@ AVAILABLE_KPIS = {
             'optimal_range_cee': "Generalmente < 0.6 per aziende stabili. Dipende dal settore e dalla fase del ciclo di vita dell'azienda.",
             'interpretation_notes': "Un rapporto più basso indica minore dipendenza dal debito. Un rapporto > 1 significa che l'azienda ha più debiti che attivi (improbabile per aziende sane).",
             'required_inputs_display': "Fondi rischi e oneri, Debiti (L/T e B/T), Risconti Passivi, Tutte le categorie di Attivo"
+        }
+    },
+    'debt_ratio_excl_tfr': {
+        'name_display': "Rapporto di Indebitamento Totale (escl. TFR)",
+        'description_short': "Indica la percentuale di attivi finanziati tramite debito (escluso TFR).",
+        'is_ratio': True,
+        'category_display': "Struttura Finanziaria e Leva",
+        'is_crisis_law_kpi': False,
+        'tooltip_info': {
+            'full_explanation': "Mostra quale proporzione degli asset di un\'azienda è finanziata attraverso il debito, escludendo il Trattamento di Fine Rapporto (TFR).",
+            'formula_display': "(Totale Passività - TFR) / Totale Attivo",
+            'optimal_range_cee': "Generalmente < 0.6. Valori leggermente inferiori al Debt Ratio standard.",
+            'interpretation_notes': "Un rapporto più basso indica minore dipendenza dal debito. Utile per analisi specifiche del TFR.",
+            'required_inputs_display': "Fondi rischi e oneri, Debiti (L/T e B/T escluso TFR), Risconti Passivi, Tutte le categorie di Attivo"
         }
     },
     'working_capital': {
@@ -785,7 +812,7 @@ POS_ATTIVITA_FINANZIARIE_CORRENTI = get_all_positions(BALANCE_SHEET_STRUCTURE['a
 # Re-populate KPI_REQUIREMENTS with the new POS_ lists for accuracy
 # Ensure these lists are flat lists of unique integers.
 _kpi_req_current_assets = [31, 32, 33, 34, 35, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50]
-_kpi_req_liquid_assets = [39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50]
+_kpi_req_liquid_assets = [39, 40, 41, 42, 43, 45]
 _kpi_req_cash = [49, 50]
 _kpi_req_current_liabilities = [79, 80, 81, 82, 83, 84, 85, 86, 87, 88]
 _kpi_req_total_liabilities = [67, 68, 69, 100, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88]
@@ -812,6 +839,15 @@ KPI_REQUIREMENTS = {
     'net_working_capital_ratio': sorted(list(set(_kpi_req_current_assets + _kpi_req_current_liabilities + _kpi_req_total_assets)))
 }
 
+# New: Total Liabilities Excluding TFR (pos 100)
+POS_TOTAL_LIABILITIES_EXCL_TFR = sorted([p for p in POS_TOTAL_LIABILITIES if p != 100])
+
+# New KPI: Debt to Equity Excluding TFR
+KPI_REQUIREMENTS['debt_to_equity_excl_tfr'] = sorted(list(set(POS_TOTAL_LIABILITIES_EXCL_TFR + POS_TOTAL_EQUITY)))
+
+# New KPI: Debt Ratio Excluding TFR
+KPI_REQUIREMENTS['debt_ratio_excl_tfr'] = sorted(list(set(POS_TOTAL_LIABILITIES_EXCL_TFR + _kpi_req_total_assets)))
+
 # Exported for calculator.py (ensure all needed are here)
 __all__ = [
     'BALANCE_SHEET_STRUCTURE', 'ALL_POSITIONS', 'KPI_REQUIREMENTS', 'AVAILABLE_KPIS',
@@ -826,5 +862,6 @@ __all__ = [
     'POS_IMMOBILIZZAZIONI_FINANZIARIE', 'POS_IMMOBILIZZAZIONI_NETTE',
     'POS_DEBITI_TRIBUTARI', 'POS_DEBITI_PREVIDENZIALI',
     'POS_DEBITI_OLTRE_12_MESI',
-    'POS_ATTIVITA_FINANZIARIE_CORRENTI'
+    'POS_ATTIVITA_FINANZIARIE_CORRENTI',
+    'POS_TOTAL_LIABILITIES_EXCL_TFR'
 ] 

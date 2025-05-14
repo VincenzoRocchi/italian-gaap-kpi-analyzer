@@ -8,7 +8,8 @@ from .constants import (
     POS_DEBITI_TRIBUTARI, POS_DEBITI_PREVIDENZIALI,
     POS_DEBITI_OLTRE_12_MESI,
     POS_ATTIVITA_FINANZIARIE_CORRENTI, # Import new POS list
-    KPI_REQUIREMENTS
+    KPI_REQUIREMENTS,
+    POS_TOTAL_LIABILITIES_EXCL_TFR
 )
 
 def calculate_selected_kpis(data, selected_kpi_keys):
@@ -79,6 +80,16 @@ def calculate_selected_kpis(data, selected_kpi_keys):
                 else:
                     result_entry['message'] = "Divisione per zero (Patrimonio Netto nullo)."
             
+            elif kpi_key == 'debt_to_equity_excl_tfr':
+                total_liabilities_excl_tfr_sum = get_sum(data, POS_TOTAL_LIABILITIES_EXCL_TFR)
+                total_equity_sum = get_sum(data, POS_TOTAL_EQUITY)
+                if total_equity_sum != 0:
+                    result_entry['value'] = total_liabilities_excl_tfr_sum / total_equity_sum
+                    result_entry['status'] = 'ok'
+                    result_entry['message'] = ''
+                else:
+                    result_entry['message'] = "Divisione per zero (Patrimonio Netto nullo)."
+
             elif kpi_key == 'debt_ratio':
                 total_liabilities_sum = get_sum(data, POS_TOTAL_LIABILITIES)
                 total_assets_sum = get_sum(data, POS_TOTAL_ASSETS)
@@ -209,6 +220,16 @@ def calculate_selected_kpis(data, selected_kpi_keys):
                 else:
                     result_entry['message'] = "Divisione per zero (Totale Attivo nullo)."
             
+            elif kpi_key == 'debt_ratio_excl_tfr':
+                total_liabilities_excl_tfr_sum = get_sum(data, POS_TOTAL_LIABILITIES_EXCL_TFR)
+                total_assets_sum = get_sum(data, POS_TOTAL_ASSETS)
+                if total_assets_sum != 0:
+                    result_entry['value'] = total_liabilities_excl_tfr_sum / total_assets_sum
+                    result_entry['status'] = 'ok'
+                    result_entry['message'] = ''
+                else:
+                    result_entry['message'] = "Divisione per zero (Totale Attivo nullo)."
+
             else: # Should not happen if kpi_key is in AVAILABLE_KPIS
                 result_entry['message'] = "Logica di calcolo non implementata."
 
