@@ -359,64 +359,75 @@ def test_financial_assets_ratio(kpi_test_setup):
 
 def test_financial_assets_ratio_div_by_zero(kpi_test_setup):
     data = kpi_test_setup["data"].copy()
-    available_kpis = kpi_test_setup["available_kpis"]
     # Ensure total assets is zero (which it is by default in the fixture)
-    # Numerator can be anything, result should be None if total_assets is 0
-    data[POS_IMMOBILIZZAZIONI_FINANZIARIE[0]] = 100 
+    # Numerator will also be zero as its components are part of total assets.
+    # data[str(POS_IMMOBILIZZAZIONI_FINANZIARIE[0])] = 100 # This line made total assets non-zero
     result = calculate_selected_kpis(data, ['financial_assets_ratio'])
-    assert result['financial_assets_ratio'] is None
+    assert result['financial_assets_ratio']['value'] is None
 
 # Tests for non_current_assets_coverage
 def test_non_current_assets_coverage_calculation(kpi_test_setup):
     data = kpi_test_setup["data"].copy()
-    data[POS_TOTAL_EQUITY[0]] = 2000  # Equity
-    data[POS_DEBITI_OLTRE_12_MESI[0]] = 1000  # Long Term Debt
-    data[POS_IMMOBILIZZAZIONI_NETTE[0]] = 1500 # Net Fixed Assets
+    data[str(POS_TOTAL_EQUITY[0])] = 2000  # Equity
+    data[str(POS_DEBITI_OLTRE_12_MESI[0])] = 1000  # Long Term Debt
+    # POS_IMMOBILIZZAZIONI_NETTE is a list of positions. Set one of its components.
+    # For example, if POS_IMMOBILIZZAZIONI_MATERIALI is part of POS_IMMOBILIZZAZIONI_NETTE:
+    data[str(POS_IMMOBILIZZAZIONI_MATERIALI[0])] = 1500 # Net Fixed Assets component
     # (2000 + 1000) / 1500 = 3000 / 1500 = 2.0
     result = calculate_selected_kpis(data, ['non_current_assets_coverage'])
-    assert result['non_current_assets_coverage'] == pytest.approx(2.0)
+    assert result['non_current_assets_coverage']['value'] == pytest.approx(2.0)
 
 def test_non_current_assets_coverage_div_by_zero(kpi_test_setup):
     data = kpi_test_setup["data"].copy()
-    data[POS_TOTAL_EQUITY[0]] = 2000
-    data[POS_DEBITI_OLTRE_12_MESI[0]] = 1000
+    data[str(POS_TOTAL_EQUITY[0])] = 2000
+    data[str(POS_DEBITI_OLTRE_12_MESI[0])] = 1000
     # Net Fixed Assets (denominator) remains 0 from kpi_test_setup
     result = calculate_selected_kpis(data, ['non_current_assets_coverage'])
-    assert result['non_current_assets_coverage'] is None
+    assert result['non_current_assets_coverage']['value'] is None
 
 # Tests for net_working_capital_ratio
 def test_net_working_capital_ratio_calculation(kpi_test_setup):
     data = kpi_test_setup["data"].copy()
-    data[POS_CURRENT_ASSETS[0]] = 1500  # Current Assets
-    data[POS_CURRENT_LIABILITIES[0]] = 500  # Current Liabilities
-    # Net Working Capital = 1500 - 500 = 1000
-    # Total Assets includes Current Assets, so set another asset to make it distinct if needed
-    # Or assume other asset items are 0, so Total Assets = Current Assets for this test
-    data[POS_TOTAL_ASSETS[0]] = 2000 # Total Assets (e.g. current assets 1500 + other assets 500)
-                                     # Let's make sure Total Assets is explicitly set for clarity.
-                                     # If POS_TOTAL_ASSETS[0] is the same as POS_CURRENT_ASSETS[0], this will overwrite.
-                                     # For simplicity, we will ensure distinct items for total assets if needed.
-                                     # For this test, let's assume current assets are part of total assets.
-                                     # Let POS_TOTAL_ASSETS[0] be an item NOT in POS_CURRENT_ASSETS for this example.
-                                     # However, POS_TOTAL_ASSETS is a sum. We set components.
-    # So, set one current asset, one non-current asset, and one current liability.
-    # Reset data to be sure
-    for i in range(1, 101): data[i] = 0
-    data[POS_CURRENT_ASSETS[0]] = 1500    # e.g., pos 31 (Inventories)
-    data[POS_CURRENT_LIABILITIES[0]] = 500 # e.g., pos 79 (Trade Payables)
-    data[POS_IMMOBILIZZAZIONI_NETTE[0]] = 500 # e.g., pos 11 (Tangible Assets), to make Total Assets = 2000
-    # NWC = 1500 - 500 = 1000. Total Assets = 1500 (CA) + 500 (NCA) = 2000.
+    # NWC = Current Assets - Current Liabilities
+    # Ratio = NWC / Total Assets
+
+    # Set components for NWC
+    data[str(POS_CURRENT_ASSETS[0])] = 1500    # e.g., pos 31 (Inventories) for Current Assets
+    data[str(POS_CURRENT_LIABILITIES[0])] = 500 # e.g., pos 79 (Trade Payables) for Current Liabilities
+    # NWC = 1500 - 500 = 1000
+
+    # Ensure Total Assets is non-zero.
+    # POS_TOTAL_ASSETS sums items 1-60.
+    # Current Assets (e.g. pos 31) is already set.
+    # Add a non-current asset to make Total Assets = 1500 (CA) + 500 (NCA) = 2000
+    # Pick a position for a non-current asset that is part of POS_TOTAL_ASSETS and not in POS_CURRENT_ASSETS
+    # For example, an item from POS_IMMOBILIZZAZIONI_MATERIALI if its first element is not also POS_CURRENT_ASSETS[0]
+    # A simpler way is to ensure that at least one item in POS_TOTAL_ASSETS that is also in POS_CURRENT_ASSETS is set (done by data[str(POS_CURRENT_ASSETS[0])]),
+    # and one item in POS_TOTAL_ASSETS that is a fixed asset is set.
+    data[str(POS_IMMOBILIZZAZIONI_MATERIALI[0])] = 500 # e.g. pos 11 (Tangible Assets) for Fixed Assets
+    
+    # Expected: NWC = 1000. Total Assets will be at least 1500 (from current) + 500 (from fixed) = 2000
+    # (assuming POS_CURRENT_ASSETS[0] and POS_IMMOBILIZZAZIONI_MATERIALI[0] are distinct and both part of POS_TOTAL_ASSETS)
     # Ratio = 1000 / 2000 = 0.5
+    
+    # To be very explicit for Total Assets for this test:
+    # Ensure other asset items that might be in POS_TOTAL_ASSETS are zero unless explicitly set.
+    # The kpi_test_setup already ensures data is zeroed out, and we made a copy.
+    # Our setting data[str(POS_CURRENT_ASSETS[0])] = 1500 and data[str(POS_IMMOBILIZZAZIONI_MATERIALI[0])] = 500
+    # will make get_sum(data, POS_TOTAL_ASSETS) = 2000 if these are the only non-zero items in range 1-60.
+
     result = calculate_selected_kpis(data, ['net_working_capital_ratio'])
-    assert result['net_working_capital_ratio'] == pytest.approx(0.5)
+    assert result['net_working_capital_ratio']['value'] == pytest.approx(0.5)
+
 
 def test_net_working_capital_ratio_div_by_zero(kpi_test_setup):
     data = kpi_test_setup["data"].copy()
-    # Numerator can be anything, e.g. CA = 100, CL = 50, NWC = 50
-    data[POS_CURRENT_ASSETS[0]] = 100
-    data[POS_CURRENT_LIABILITIES[0]] = 50
-    # Total Assets (denominator) remains 0 from kpi_test_setup
+    # Numerator (NWC = CA - CL):
+    # CA will be 0 as no current asset items are set (so Total Assets is also 0).
+    # data[str(POS_CURRENT_ASSETS[0])] = 100 # This line made Total Assets non-zero
+    data[str(POS_CURRENT_LIABILITIES[0])] = 50 # CL = 50, so NWC = 0 - 50 = -50
+    # Total Assets (denominator) remains 0 from kpi_test_setup as no asset items are set.
     result = calculate_selected_kpis(data, ['net_working_capital_ratio'])
-    assert result['net_working_capital_ratio'] is None
+    assert result['net_working_capital_ratio']['value'] is None
 
 # Removed SAMPLE_DATA and unittest.main() as they are not idiomatic for pytest 
