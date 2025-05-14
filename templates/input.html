@@ -108,22 +108,41 @@
                       {# Check if Level 1 value is a dictionary (Level 2 exists) #}
                       {% if l1_value is mapping %} 
                           {# Iterate through Level 2 keys like intangible, tangible... #}
-                          {% for l2_key, l2_positions in l1_value.items() %}
+                          {% for l2_key, l2_items_or_dict in l1_value.items() %}
                               <div class="ms-2 mb-3"> {# Indent Level 2 slightly #}
                                   {# Display Level 2 Title (e.g., B.I) Immobilizzazioni Immateriali) #}
                                   <h5 class="text-muted fw-normal mb-2">{{ section_titles.get(l2_key, l2_key.replace('_', ' ').title()) }}</h5>
-                                  {# Display Inputs for this Level 2 group #}
-                                  {% for pos in l2_positions %}
-                                      <div class="mb-2 input-group input-group-sm">
-                                          <span class="input-group-text" style="width: 70px;">Pos. {{ pos }}</span>
-                                          <input type="text" class="form-control auto-calculate" name="pos_{{ pos }}"
-                                                 id="pos_{{ pos }}" value="{{ data.get(pos|string, '') }}"
-                                                 inputmode="decimal" placeholder="0.00">
-                                      </div>
-                                      <small class="text-muted d-block mb-1 ms-1">{{ position_names.get(pos|int, '') }}</small>
-                                      {# Div to display automotive codes #}
-                                      <div class="mapping-display-area" data-cee-pos="{{ pos }}"></div>
-                                  {% endfor %}
+                                  
+                                  {# Check if l2_items_or_dict is a dictionary (like for trade_and_other_receivables) #}
+                                  {% if l2_items_or_dict is mapping %}
+                                      {% for specific_item_key, actual_pos_list in l2_items_or_dict.items() %} {# specific_item_key is 'due_from_customers_current', actual_pos_list is ['39'] #}
+                                          {% for actual_pos in actual_pos_list %} {# actual_pos is '39', '39.NCA' #}
+                                              <div class="mb-2 input-group input-group-sm">
+                                                  <span class="input-group-text" style="width: 70px;">Pos. {{ actual_pos }}</span>
+                                                  <input type="text" class="form-control auto-calculate" name="pos_{{ actual_pos }}"
+                                                         id="pos_{{ actual_pos }}" value="{{ data.get(actual_pos|string, '') }}"
+                                                         inputmode="decimal" placeholder="0.00">
+                                              </div>
+                                              <small class="text-muted d-block mb-1 ms-1">
+                                                  {{ position_names.get(actual_pos, actual_pos) }} {# Fallback to actual_pos #}
+                                              </small>
+                                              <div class="mapping-display-area" data-cee-pos="{{ actual_pos }}"></div>
+                                          {% endfor %}
+                                      {% endfor %}
+                                  {% elif l2_items_or_dict is iterable and l2_items_or_dict is not string %} {# l2_items_or_dict is a list (standard case) #}
+                                      {% for pos in l2_items_or_dict %} {# pos is '31', '32', etc. #}
+                                          <div class="mb-2 input-group input-group-sm">
+                                              <span class="input-group-text" style="width: 70px;">Pos. {{ pos }}</span>
+                                              <input type="text" class="form-control auto-calculate" name="pos_{{ pos }}"
+                                                     id="pos_{{ pos }}" value="{{ data.get(pos|string, '') }}"
+                                                     inputmode="decimal" placeholder="0.00">
+                                          </div>
+                                          <small class="text-muted d-block mb-1 ms-1">
+                                              {{ position_names.get(pos, pos) }} {# Fallback to pos #}
+                                          </small>
+                                          <div class="mapping-display-area" data-cee-pos="{{ pos }}"></div>
+                                      {% endfor %}
+                                  {% endif %}
                               </div>
                           {% endfor %}
                       {# Check if Level 1 value is a list (Direct positions like prepaid) #}
@@ -137,8 +156,9 @@
                                              id="pos_{{ pos }}" value="{{ data.get(pos|string, '') }}"
                                              inputmode="decimal" placeholder="0.00">
                                   </div>
-                                  <small class="text-muted d-block mb-1 ms-1">{{ position_names.get(pos|int, '') }}</small>
-                                  {# Div to display automotive codes #}
+                                  <small class="text-muted d-block mb-1 ms-1">
+                                      {{ position_names.get(pos, pos) }} {# Fallback to pos #}
+                                  </small>
                                   <div class="mapping-display-area" data-cee-pos="{{ pos }}"></div>
                               {% endfor %}
                           </div>
@@ -165,22 +185,41 @@
                       {# Check if Level 1 value is a dictionary (Level 2 exists) #}
                       {% if l1_value is mapping %} 
                           {# Iterate through Level 2 keys like capital, reserves, long_term... #}
-                          {% for l2_key, l2_positions in l1_value.items() %}
+                          {% for l2_key, l2_items_or_dict in l1_value.items() %}
                               <div class="ms-2 mb-3"> {# Indent Level 2 slightly #}
                                   {# Display Level 2 Title (e.g., A.I) Capitale) #}
                                   <h5 class="text-muted fw-normal mb-2">{{ section_titles.get(l2_key, l2_key.replace('_', ' ').title()) }}</h5>
-                                  {# Display Inputs for this Level 2 group #}
-                                  {% for pos in l2_positions %}
-                                       <div class="mb-2 input-group input-group-sm">
-                                          <span class="input-group-text" style="width: 70px;">Pos. {{ pos }}</span>
-                                          <input type="text" class="form-control auto-calculate" name="pos_{{ pos }}"
-                                                 id="pos_{{ pos }}" value="{{ data.get(pos|string, '') }}"
-                                                 inputmode="decimal" placeholder="0.00">
-                                      </div>
-                                      <small class="text-muted d-block mb-1 ms-1">{{ position_names.get(pos|int, '') }}</small>
-                                      {# Div to display automotive codes #}
-                                      <div class="mapping-display-area" data-cee-pos="{{ pos }}"></div>
-                                  {% endfor %}
+                                  
+                                  {# Check if l2_items_or_dict is a dictionary (e.g. if liabilities had a similar structure) #}
+                                  {% if l2_items_or_dict is mapping %}
+                                      {% for specific_item_key, actual_pos_list in l2_items_or_dict.items() %}
+                                          {% for actual_pos in actual_pos_list %}
+                                               <div class="mb-2 input-group input-group-sm">
+                                                  <span class="input-group-text" style="width: 70px;">Pos. {{ actual_pos }}</span>
+                                                  <input type="text" class="form-control auto-calculate" name="pos_{{ actual_pos }}"
+                                                         id="pos_{{ actual_pos }}" value="{{ data.get(actual_pos|string, '') }}"
+                                                         inputmode="decimal" placeholder="0.00">
+                                              </div>
+                                              <small class="text-muted d-block mb-1 ms-1">
+                                                  {{ position_names.get(actual_pos, actual_pos) }} {# Fallback to actual_pos #}
+                                              </small>
+                                              <div class="mapping-display-area" data-cee-pos="{{ actual_pos }}"></div>
+                                          {% endfor %}
+                                      {% endfor %}
+                                  {% elif l2_items_or_dict is iterable and l2_items_or_dict is not string %} {# l2_items_or_dict is a list (standard case) #}
+                                      {% for pos in l2_items_or_dict %}
+                                           <div class="mb-2 input-group input-group-sm">
+                                              <span class="input-group-text" style="width: 70px;">Pos. {{ pos }}</span>
+                                              <input type="text" class="form-control auto-calculate" name="pos_{{ pos }}"
+                                                     id="pos_{{ pos }}" value="{{ data.get(pos|string, '') }}"
+                                                     inputmode="decimal" placeholder="0.00">
+                                          </div>
+                                          <small class="text-muted d-block mb-1 ms-1">
+                                              {{ position_names.get(pos, pos) }} {# Fallback to pos #}
+                                          </small>
+                                          <div class="mapping-display-area" data-cee-pos="{{ pos }}"></div>
+                                      {% endfor %}
+                                  {% endif %}
                               </div>
                           {% endfor %}
                        {# Check if Level 1 value is a list (Direct positions like provisions, accrued) #}
@@ -194,8 +233,9 @@
                                              id="pos_{{ pos }}" value="{{ data.get(pos|string, '') }}"
                                              inputmode="decimal" placeholder="0.00">
                                   </div>
-                                  <small class="text-muted d-block mb-1 ms-1">{{ position_names.get(pos|int, '') }}</small>
-                                  {# Div to display automotive codes #}
+                                  <small class="text-muted d-block mb-1 ms-1">
+                                      {{ position_names.get(pos, pos) }} {# Fallback to pos #}
+                                  </small>
                                   <div class="mapping-display-area" data-cee-pos="{{ pos }}"></div>
                               {% endfor %}
                           </div>

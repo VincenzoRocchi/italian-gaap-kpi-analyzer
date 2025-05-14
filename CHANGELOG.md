@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.2 Beta] - 2025-05-14
+
+### Changed
+- **Core Architecture:** Migrated CEE balance sheet position keys from integers to strings throughout the application (e.g., in `app_logic/constants.py`, `app.py`, `templates/input.html`). This foundational change allows for more flexible position definitions, such as `'39'` for current and `'39.NCA'` for non-current assets.
+- Refined `quick_ratio` definition in `app_logic/constants.py` for closer alignment with standard financial practices by ensuring the numerator correctly combines liquid assets, cash, and current financial assets, and the denominator uses current liabilities.
+
+### Fixed
+- Resolved `NameError` in `app_logic/constants.py` where `_kpi_req_total_assets` was used before its definition; corrected by reordering variable initializations.
+- Addressed various `TypeError` and `KeyError` issues in `app.py` and `app_logic/constants.py` stemming from the transition to string-based position keys.
+- Corrected logic in `app.py` for building `required_structure` to accurately handle nested dictionary structures for receivables in `templates/input.html` after the string key migration.
+- General review and confirmation of other KPI definitions in `app_logic/constants.py` against financial standards.
+
+## [0.3.1] - 2025-05-14 
+### Added
+- New KPIs: `debt_to_equity_excl_tfr` and `debt_ratio_excl_tfr` to provide financial insights excluding the Employee Severance Indemnity (TFR).
+
+### Changed
+- Updated `app_logic/constants.py` to include `POS_TOTAL_LIABILITIES_EXCL_TFR` and new entries in `KPI_REQUIREMENTS` for the TFR-exclusive KPIs.
+- Modified `app_logic/calculator.py` to implement the calculation logic for `debt_to_equity_excl_tfr` and `debt_ratio_excl_tfr`.
+
 ## [0.3.0 Beta] - 2025-05-14
 
 ### Added

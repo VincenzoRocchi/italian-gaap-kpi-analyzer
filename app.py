@@ -30,7 +30,7 @@ def inject_now():
 
 @app.context_processor
 def inject_app_version():
-    return {'app_version': "0.3.0 Beta"} # Inject app version
+    return {'app_version': "0.3.2 Beta"} # Inject app version
 
 @app.after_request
 def add_security_headers(response):
@@ -67,6 +67,15 @@ def index():
 
 @app.route('/input', methods=['GET', 'POST'])
 def input_required_fields():
+    # Define sort_key_func at a scope accessible throughout the function
+    def sort_key_func(item_key):
+        parts = item_key.split('.')
+        if len(parts) == 1 and parts[0].isdigit():
+            return (int(parts[0]), '')
+        elif len(parts) == 2 and parts[0].isdigit() and parts[1] == 'NCA':
+            return (int(parts[0]), parts[1])
+        return (float('inf'), item_key) # Fallback for non-standard keys, sorts them last
+
     if request.method == 'POST':
         selected_kpi_keys = request.form.getlist('kpi_keys')
         valid, error_message = validate_kpi_selection(selected_kpi_keys, AVAILABLE_KPIS)
@@ -74,27 +83,29 @@ def input_required_fields():
             flash(error_message, "warning")
             return redirect(url_for('index'))
 
-        required_positions = set()
+        required_positions_set = set()
         for key in selected_kpi_keys:
             if key in KPI_REQUIREMENTS:
-                required_positions.update(KPI_REQUIREMENTS[key])
-
-        sorted_required_positions = sorted(list(required_positions))
+                required_positions_set.update(KPI_REQUIREMENTS[key])
+        
+        sorted_required_positions = sorted(list(required_positions_set), key=sort_key_func)
+        
         session['required_positions'] = sorted_required_positions
         session['selected_kpis'] = selected_kpi_keys
+        
         existing_data = session.get('balance_sheet_data', {})
-        session['balance_sheet_data'] = {str(pos): existing_data.get(str(pos), 0.0) for pos in sorted_required_positions}
+        current_balance_sheet_data = {str(pos): existing_data.get(str(pos), 0.0) for pos in sorted_required_positions}
+        session['balance_sheet_data'] = current_balance_sheet_data
+        
+        return redirect(url_for('input_required_fields'))
 
     elif request.method == 'GET':
         if 'selected_kpis' not in session or 'required_positions' not in session:
             flash("Sessione non valida o scaduta. Seleziona nuovamente i KPI.", "warning")
             return redirect(url_for('index'))
+        
         if 'balance_sheet_data' not in session:
              session['balance_sheet_data'] = {str(pos): 0.0 for pos in session.get('required_positions', [])}
-        flash("Modifica i valori inseriti e ricalcola.", "info")
-
-    else: 
-        return redirect(url_for('index'))
 
     selected_kpi_keys = session.get('selected_kpis', [])
     sorted_required_positions = session.get('required_positions', [])
@@ -106,33 +117,42 @@ def input_required_fields():
 
     selected_kpi_details = {key: AVAILABLE_KPIS[key] for key in selected_kpi_keys if key in AVAILABLE_KPIS}
 
-    required_structure = {}
-    for main_cat, sub_cats in BALANCE_SHEET_STRUCTURE.items():
-        req_main_cat = {}
-        for sub_cat_name, content in sub_cats.items():
-            if isinstance(content, dict):
-                req_sub_cat = {}
-                for nested_name, nested_positions in content.items():
-                    req_nested_pos = [p for p in nested_positions if p in sorted_required_positions]
-                    if req_nested_pos:
-                        req_sub_cat[nested_name] = req_nested_pos
-                if req_sub_cat:
-                     req_main_cat[sub_cat_name] = req_sub_cat
-            elif isinstance(content, list):
-                req_pos = [p for p in content if p in sorted_required_positions]
-                if req_pos:
-                    req_main_cat[sub_cat_name] = req_pos
-        if req_main_cat:
-            required_structure[main_cat] = req_main_cat
+    required_structure = collections.defaultdict(lambda: collections.defaultdict(dict))
+    # temp_structure_for_ordering was removed as it's not essential for this restored logic.
+
+    for main_cat_key, main_cat_value in BALANCE_SHEET_STRUCTURE.items():
+        for sub_cat_key, sub_cat_value in main_cat_value.items():
+            if isinstance(sub_cat_value, dict): # e.g., 'non_current_assets', 'current_assets', 'equity', 'liabilities'
+                for item_group_key, item_group_value in sub_cat_value.items(): 
+                    if isinstance(item_group_value, dict): # Special case for 'trade_and_other_receivables'
+                        # Initialize dict for this group if it's not already there
+                        if item_group_key not in required_structure[main_cat_key][sub_cat_key]:
+                            required_structure[main_cat_key][sub_cat_key][item_group_key] = {}
+                        for specific_receivable_key, specific_receivable_list in item_group_value.items():
+                            relevant_positions = [p for p in specific_receivable_list if p in sorted_required_positions]
+                            if relevant_positions:
+                                required_structure[main_cat_key][sub_cat_key][item_group_key][specific_receivable_key] = relevant_positions
+                    elif isinstance(item_group_value, list): # Standard case like 'inventories'
+                        relevant_positions = [p for p in item_group_value if p in sorted_required_positions]
+                        if relevant_positions:
+                            # Ensure the order from sorted_required_positions is maintained for the displayed list
+                            ordered_relevant_positions = [p for p in sorted_required_positions if p in relevant_positions]
+                            required_structure[main_cat_key][sub_cat_key][item_group_key] = ordered_relevant_positions
+            elif isinstance(sub_cat_value, list): # Top-level lists like 'due_from_shareholders'
+                relevant_positions = [p for p in sub_cat_value if p in sorted_required_positions]
+                if relevant_positions:
+                    ordered_relevant_positions = [p for p in sorted_required_positions if p in relevant_positions]
+                    required_structure[main_cat_key][sub_cat_key] = ordered_relevant_positions
+    
+    final_required_structure = json.loads(json.dumps(required_structure))
 
     all_mapping_data = {
         "automotive_dealer": CEE_TO_AUTOMOTIVE_CODES
     }
 
     return render_template('input.html',
-                           structure=required_structure, 
+                           structure=final_required_structure, 
                            data=current_data, 
-                           required_positions=sorted_required_positions,
                            position_names=POSITION_NAMES,
                            selected_kpi_details=selected_kpi_details, 
                            section_titles=SECTION_TITLES,
@@ -176,6 +196,26 @@ def calculate():
                 else:
                     input_data_by_kpi_display[kpi_key][pos_str] = None
 
+    # Prepare details for each KPI's inputs
+    kpi_input_details = {}
+    for kpi_key in selected_kpi_keys:
+        kpi_input_details[kpi_key] = []
+        required_positions = KPI_REQUIREMENTS.get(kpi_key, [])
+        
+        # Create a flat list of all unique positions required by any selected KPI for display
+        # This is for the "Dati Inseriti per KPI" section which is separate from individual KPI cards now
+        
+        for pos_key in sorted(required_positions, key=lambda x: str(x)): # pos_key is already a string
+            value = balance_sheet_data.get(pos_key, 0.0) # Use string pos_key directly
+            name = POSITION_NAMES.get(pos_key, f"Position {pos_key}") # Use string pos_key directly
+            kpi_input_details[kpi_key].append({
+                'position': pos_key,
+                'name_display': name,
+                'value': value
+            })
+    
+    # Consolidate all unique input data across all calculated KPIs for the "Dati Inseriti" card
+
     return render_template(
         "results.html",
         results=kpis_results, 
@@ -185,7 +225,8 @@ def calculate():
         available_kpis=AVAILABLE_KPIS, 
         position_names=POSITION_NAMES, 
         selected_kpi_keys=selected_kpi_keys, 
-        section_titles=SECTION_TITLES
+        section_titles=SECTION_TITLES,
+        kpi_input_details=kpi_input_details
     )
 
 if __name__ == '__main__':

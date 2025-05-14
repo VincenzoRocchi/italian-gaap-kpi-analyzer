@@ -2,60 +2,73 @@
 BALANCE_SHEET_STRUCTURE = {
     'assets': {
         # A) Crediti verso soci per versamenti ancora dovuti
-        'due_from_shareholders': [], # Placeholder, as no specific 1-88 pos typically assigned here
+        'due_from_shareholders': [], # Placeholder, e.g. ['A1'] if specific position needed
         # B) Immobilizzazioni
-        'non_current_assets': { # B) (Kept key 'non_current_assets' for consistency, maps to B)
-            'intangible_assets': list(range(1, 11)),        # B.I
-            'tangible_assets': list(range(11, 26)),          # B.II
-            'financial_investments_non_current': list(range(26, 31)) # B.III
+        'non_current_assets': { # B)
+            'intangible_assets': list(map(str, range(1, 11))),        # B.I (1-10)
+            'tangible_assets': list(map(str, range(11, 26))),          # B.II (11-25)
+            'financial_investments_non_current': list(map(str, range(26, 31))) # B.III (26-30)
         },
         # C) Attivo Circolante
-        'current_assets': { # C) (Kept key 'current_assets')
-            'inventories': list(range(31, 39)),              # C.I
-            'trade_and_other_receivables': list(range(39, 45)), # C.II
-            'current_financial_assets': list(range(46, 49)), # C.III
-            'cash_and_cash_equivalents': list(range(49, 51)) # C.IV
+        'current_assets': { # C)
+            'inventories': list(map(str, range(31, 39))),              # C.I (31-38)
+            'trade_and_other_receivables': {                         # C.II
+                'due_from_customers_current': ['39'],
+                'due_from_customers_non_current': ['39.NCA'],
+                'due_from_subsidiaries_current': ['40'],
+                'due_from_subsidiaries_non_current': ['40.NCA'],
+                'due_from_associates_current': ['41'],
+                'due_from_associates_non_current': ['41.NCA'],
+                'due_from_parent_companies_current': ['42'],
+                'due_from_parent_companies_non_current': ['42.NCA'],
+                'tax_receivables_current': ['43'], # Crediti tributari
+                'tax_receivables_non_current': ['43.NCA'],
+                'deferred_tax_assets_current': ['44'], # Imposte anticipate
+                'deferred_tax_assets_non_current': ['44.NCA'],
+                'other_receivables_current': ['45'], # Crediti verso altri
+                'other_receivables_non_current': ['45.NCA'],
+            },
+            'current_financial_assets': list(map(str, range(46, 49))), # C.III (46-48)
+            'cash_and_cash_equivalents': list(map(str, range(49, 51))) # C.IV (49-50)
         },
         # D) Ratei e Risconti Attivi
-        'prepaid_expenses_and_accrued_income': [51] # D)
+        'prepaid_expenses_and_accrued_income': ['51'] # D)
     },
     'equity_liabilities': {
         # A) Patrimonio Netto
         'equity': { # A)
-            'capital_social': [52],                             # A.I Capitale Sociale
-            # Pos 53 "Fondo di dotazione" - can be added if needed, often for specific entity types.
-            'share_premium_reserve': [54],                      # A.II Riserva da sovrapprezzo azioni
-            'revaluation_reserve': [55],                        # A.III Riserve di rivalutazione
-            'legal_reserve': [56],                              # A.IV Riserva legale
-            'statutory_reserves': [57],                         # A.V Riserve statutarie
-            'other_reserves': [58],                             # A.VI Altre riserve (can include 53, 59-63 concepts)
-            # A.VII Riserva per operazioni di copertura dei flussi finanziari attesi - often in Altre riserve or requires specific new pos if available
-            'retained_earnings_or_accumulated_loss_bf': [64],   # A.VIII Utili (perdite) portati a nuovo
-            'profit_or_loss_for_the_year': [65],                # A.IX Utile (perdita) dell'esercizio
-            'negative_reserve_for_treasury_shares': [66]        # A.X Riserva negativa per azioni proprie in portafoglio
+            'capital_social': ['52'],
+            'fondo_di_dotazione': ['53'],
+            'share_premium_reserve': ['54'],
+            'revaluation_reserve': ['55'],
+            'legal_reserve': ['56'],
+            'statutory_reserves': ['57'],
+            'other_reserves': ['58'],
+            'retained_earnings_or_accumulated_loss_bf': ['64'],
+            'profit_or_loss_for_the_year': ['65'],
+            'negative_reserve_for_treasury_shares': ['66']
         },
         # B) Fondi per Rischi e Oneri
-        'provisions_for_risks_and_charges': list(range(67, 70)), # B)
+        'provisions_for_risks_and_charges': list(map(str, range(67, 70))), # B) (67-69)
         # C) Trattamento di Fine Rapporto di Lavoro Subordinato
-        'employee_severance_indemnity_tfr': [100], # C) Assigned custom position 100 (Non-CEE standard)
+        'employee_severance_indemnity_tfr': ['100'], # C) Custom position
         # D) Debiti
         'liabilities': { # D)
-            'bonds_issued': [70],                               # D.1 Obbligazioni (non-convertible)
-            'convertible_bonds_issued': [71],                   # D.2 Obbligazioni Convertibili
-            'amounts_owed_to_shareholders_for_loans': [72],     # D.3 Debiti verso soci per finanziamenti
-            'amounts_owed_to_banks': [73, 80],                  # D.4 Debiti verso banche (73 > 1yr, 80 <= 1yr)
-            'amounts_owed_to_other_lenders': [74, 81],          # D.5 Debiti verso altri finanziatori (74 > 1yr, 81 <= 1yr)
-            'advances_received_from_customers': [75, 82],       # D.6 Acconti da clienti (75 > 1yr, 82 <= 1yr)
-            'trade_payables': [76, 79],                         # D.7 Debiti verso fornitori (76 > 1yr, 79 <= 1yr)
-            'debt_represented_by_credit_instruments': [77, 83], # D.8 Debiti rappresentati da titoli di credito (77 > 1yr, 83 <= 1yr)
-            'amounts_owed_to_group_companies': [78, 84],        # D.9 Debiti verso imprese del gruppo (parent, subs, assoc.) (78 > 1yr, 84 <= 1yr)
-            # D.10, D.11, D.12 for specific controlled, associated, parent co if not aggregated in D.9
-            'tax_payables': [85],                               # D.13 Debiti tributari (assuming this refers to the specific CEE/It number)
-            'social_security_payables': [86],                   # D.14 Debiti verso istituti di previdenza (assuming CEE/It number)
-            'other_payables': [87]                              # D.15 Altri debiti (assuming CEE/It number)
+            'bonds_issued': ['70'],
+            'convertible_bonds_issued': ['71'],
+            'amounts_owed_to_shareholders_for_loans': ['72'],
+            'amounts_owed_to_banks': ['73', '80'], # 73 > 1yr, 80 <= 1yr
+            'amounts_owed_to_other_lenders': ['74', '81'], # 74 > 1yr, 81 <= 1yr
+            'advances_received_from_customers': ['75', '82'], # 75 > 1yr, 82 <= 1yr
+            'trade_payables': ['76', '79'], # 76 > 1yr, 79 <= 1yr
+            'debt_represented_by_credit_instruments': ['77', '83'], # 77 > 1yr, 83 <= 1yr
+            'amounts_owed_to_group_companies': ['78', '84'], # 78 > 1yr, 84 <= 1yr
+            'tax_payables': ['85'],
+            'social_security_payables': ['86'],
+            'other_payables': ['87']
         },
         # E) Ratei e Risconti Passivi
-        'accrued_expenses_and_deferred_income': [88] # E)
+        'accrued_expenses_and_deferred_income': ['88'] # E)
     }
 }
 
@@ -66,7 +79,8 @@ def get_all_positions(structure_part):
         for key, value in structure_part.items():
             positions.extend(get_all_positions(value)) # Recurse for dictionaries
     elif isinstance(structure_part, list):
-        if all(isinstance(item, int) for item in structure_part):
+        # Expecting list of strings now
+        if all(isinstance(item, str) for item in structure_part):
              positions.extend(structure_part) # Extend if it's a list of positions
     return sorted(list(set(positions))) # Return unique sorted positions
 
@@ -74,46 +88,7 @@ ALL_POSITIONS = get_all_positions(BALANCE_SHEET_STRUCTURE)
 
 # Map KPIs to the positions they require (UPDATED for new structure)
 KPI_REQUIREMENTS = {
-    'current_ratio': 
-        [31, 32, 33, 34, 35] + 
-        [39, 40, 41, 42, 43, 44, 45] + 
-        [46, 47, 48] + 
-        [49, 50] + 
-        [79, 80, 81, 82, 83, 84, 85, 86, 87, 88], 
-    'quick_ratio': 
-        [39, 40, 41, 42, 43, 45] +  # C.II Crediti, EXCLUDING 44 (Deferred Tax Assets)
-        [49, 50] +                    # C.IV Cash and cash equivalents
-        [79, 80, 81, 82, 83, 84, 85, 86, 87, 88], # Current Liabilities
-    'cash_ratio': 
-        [49, 50] + 
-        [79, 80, 81, 82, 83, 84, 85, 86, 87, 88], 
-    'debt_to_equity': 
-        [67, 68, 69] + 
-        [100] + 
-        [70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87] + 
-        [88] + 
-        [52, 54, 55, 56, 57, 58, 59, 64, 65, 66], 
-    'debt_ratio': 
-        [67, 68, 69] + 
-        [100] + 
-        [70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87] + 
-        [88] + 
-        [1, 2, 3, 4, 5, 6, 7] + 
-        [11, 12, 13, 14, 15] + 
-        [26, 27, 28, 29, 30] + 
-        [31, 32, 33, 34, 35] + 
-        [39, 40, 41, 42, 43, 44, 45] + 
-        [46, 47, 48] + 
-        [49, 50] + 
-        [51], 
-    'working_capital': 
-        [31, 32, 33, 34, 35] + 
-        [39, 40, 41, 42, 43, 44, 45] + 
-        [46, 47, 48] + 
-        [49, 50] + 
-        [79, 80, 81, 82, 83, 84, 85, 86, 87, 88]
-    # The new KPIs (asset_rigidity_index, etc.) will be added to this dictionary
-    # later in the script, after their respective POS_ lists are dynamically generated.
+    # These will be repopulated after POS_ lists are updated with string keys
 }
 
 # Temporary static definition of available KPIs (Tier 1 for now)
@@ -388,95 +363,104 @@ AVAILABLE_KPIS = {
 
 # Map position numbers to Italian names (Aligned with Art. 2424 C.C. based on analysis)
 POSITION_NAMES = {
-    1: "Costi di impianto e di ampliamento",
-    2: "Costi di sviluppo",
-    3: "Diritti di brevetto industriale e diritti di utilizzazione delle opere dell'ingegno",
-    4: "Concessioni, licenze, marchi e diritti simili",
-    5: "Avviamento",
-    6: "Immobilizzazioni in corso e acconti",
-    7: "Altre immobilizzazioni immateriali",
-    8: "(Non standard C.C. - Placeholder 8)",
-    9: "(Non standard C.C. - Placeholder 9)",
-    10: "(Non standard C.C. - Placeholder 10)",
-    11: "Terreni e fabbricati",
-    12: "Impianti e macchinario",
-    13: "Attrezzature industriali e commerciali",
-    14: "Altri beni",
-    15: "Immobilizzazioni in corso e acconti",
-    16: "(Non standard C.C. - Placeholder 16)",
-    17: "(Non standard C.C. - Placeholder 17)",
-    18: "(Non standard C.C. - Placeholder 18)",
-    19: "(Non standard C.C. - Placeholder 19)",
-    20: "(Non standard C.C. - Placeholder 20)",
-    21: "(Non standard C.C. - Placeholder 21)",
-    22: "(Non standard C.C. - Placeholder 22)",
-    23: "(Non standard C.C. - Placeholder 23)",
-    24: "(Non standard C.C. - Placeholder 24)",
-    25: "(Non standard C.C. - Placeholder 25)",
-    26: "Partecipazioni in imprese controllate",
-    27: "Partecipazioni in imprese collegate",
-    28: "Partecipazioni in imprese controllanti",
-    29: "Altre partecipazioni",
-    30: "Altri titoli immobilizzati",
-    31: "Materie prime, sussidiarie e di consumo",
-    32: "Prodotti in corso di lavorazione e semilavorati",
-    33: "Lavori in corso su ordinazione",
-    34: "Prodotti finiti e merci",
-    35: "Acconti", 
-    36: "(Non standard C.C. - Rimanenze Placeholder 36)",
-    37: "(Non standard C.C. - Rimanenze Placeholder 37)",
-    38: "(Non standard C.C. - Rimanenze Placeholder 38)",
-    39: "Crediti verso clienti",
-    40: "Crediti verso imprese controllate",
-    41: "Crediti verso imprese collegate",
-    42: "Crediti verso imprese controllanti",
-    43: "Crediti tributari", 
-    44: "Imposte anticipate", 
-    45: "Crediti verso altri",
-    46: "Partecipazioni in altre imprese",
-    47: "Altri titoli",
-    48: "Strumenti finanziari derivati attivi",
-    49: "Depositi bancari e postali",
-    50: "Assegni e denaro in cassa",
-    51: "Risconti attivi",
-    52: "Capitale sociale",
-    53: "Fondo di dotazione",
-    54: "Riserva da sovrapprezzo delle azioni", 
-    55: "Riserve di rivalutazione",
-    56: "Riserva legale",
-    57: "Riserve statutarie",
-    58: "Altre riserve, distintamente indicate", 
-    59: "Riserva per operazioni di copertura di flussi finanziari attesi", 
-    60: "(Non standard C.C. - Riserve Placeholder 60)",
-    61: "(Non standard C.C. - Riserve Placeholder 61)",
-    62: "(Non standard C.C. - Riserve Placeholder 62)",
-    63: "(Non standard C.C. - Riserve Placeholder 63)",
-    64: "Utili (perdite) portati a nuovo",
-    65: "Utile (perdita) dell'esercizio",
-    66: "Riserva negativa per azioni proprie in portafoglio",
-    67: "Fondi per imposte, anche differite",
-    68: "Fondi per quiescenza e obblighi simili",
-    69: "Altri fondi",
-    70: "Obbligazioni",
-    71: "Obbligazioni convertibili",
-    72: "Debiti verso soci per finanziamenti",
-    73: "Debiti verso banche (oltre 12 mesi)",
-    74: "Debiti verso altri finanziatori (oltre 12 mesi)",
-    75: "Acconti da clienti (oltre 12 mesi)",
-    76: "Debiti verso fornitori (oltre 12 mesi)",
-    77: "Debiti rappresentati da titoli di credito (oltre 12 mesi)",
-    78: "Debiti verso imprese controllate/collegate/controllanti (oltre 12 mesi)", 
-    79: "Debiti verso fornitori (entro 12 mesi)",
-    80: "Debiti verso banche (entro 12 mesi)",
-    81: "Debiti verso altri finanziatori (entro 12 mesi)",
-    82: "Acconti da clienti (entro 12 mesi)",
-    83: "Debiti rappresentati da titoli di credito (entro 12 mesi)",
-    84: "Debiti verso imprese controllate/collegate/controllanti (entro 12 mesi)", 
-    85: "Debiti tributari",
-    86: "Debiti verso istituti di previdenza e sicurezza sociale",
-    87: "Altri debiti (entro 12 mesi)",
-    88: "Risconti passivi",
-    100: "Trattamento di fine rapporto di lavoro subordinato" 
+    '1': "Costi di impianto e di ampliamento",
+    '2': "Costi di sviluppo", # Note: Italian schema "Costi di Ricerca e Sviluppo (R&S) e di pubblicità"
+    '3': "Diritti di brevetto industriale e diritti di utilizzazione delle opere dell'ingegno",
+    '4': "Concessioni, licenze, marchi e diritti simili",
+    '5': "Avviamento",
+    '6': "Immobilizzazioni in corso e acconti (Immateriali)",
+    '7': "Altre immobilizzazioni immateriali",
+    '8': "(Placeholder 8 - Immateriali)", # Keep placeholders if structure uses them
+    '9': "(Placeholder 9 - Immateriali)",
+    '10': "(Placeholder 10 - Immateriali)",
+    '11': "Terreni e fabbricati",
+    '12': "Impianti e macchinario",
+    '13': "Attrezzature industriali e commerciali",
+    '14': "Altri beni (Materiali)",
+    '15': "Immobilizzazioni in corso e acconti (Materiali)",
+    '16': "(Placeholder 16 - Materiali)",
+    '17': "(Placeholder 17 - Materiali)",
+    '18': "(Placeholder 18 - Materiali)",
+    '19': "(Placeholder 19 - Materiali)",
+    '20': "(Placeholder 20 - Materiali)",
+    '21': "(Placeholder 21 - Materiali)",
+    '22': "(Placeholder 22 - Materiali)",
+    '23': "(Placeholder 23 - Materiali)",
+    '24': "(Placeholder 24 - Materiali)",
+    '25': "(Placeholder 25 - Materiali)",
+    '26': "Partecipazioni in imprese controllate (Immobilizzate)",
+    '27': "Partecipazioni in imprese collegate (Immobilizzate)",
+    '28': "Partecipazioni in imprese controllanti (Immobilizzate)", # Schema: B.III.1.c)
+    '29': "Altre partecipazioni (Immobilizzate)", # Schema: B.III.1.d) Altre imprese
+    '30': "Altri titoli immobilizzati", # Schema: B.III.3
+    # Schema B.III.2 Crediti (immobilizzati) and B.III.4 Azioni Proprie are not in current structure range 26-30
+    '31': "Materie prime, sussidiarie e di consumo",
+    '32': "Prodotti in corso di lavorazione e semilavorati",
+    '33': "Lavori in corso su ordinazione",
+    '34': "Prodotti finiti e merci",
+    '35': "Acconti (a fornitori per rimanenze)",
+    '36': "(Placeholder 36 - Rimanenze)",
+    '37': "(Placeholder 37 - Rimanenze)",
+    '38': "(Placeholder 38 - Rimanenze)",
+    '39': "Crediti verso clienti (entro 12 mesi)",
+    '39.NCA': "Crediti verso clienti (oltre 12 mesi)",
+    '40': "Crediti verso imprese controllate (entro 12 mesi)",
+    '40.NCA': "Crediti verso imprese controllate (oltre 12 mesi)",
+    '41': "Crediti verso imprese collegate (entro 12 mesi)",
+    '41.NCA': "Crediti verso imprese collegate (oltre 12 mesi)",
+    '42': "Crediti verso imprese controllanti (entro 12 mesi)",
+    '42.NCA': "Crediti verso imprese controllanti (oltre 12 mesi)",
+    '43': "Crediti tributari (entro 12 mesi)",
+    '43.NCA': "Crediti tributari (oltre 12 mesi)",
+    '44': "Imposte anticipate (considerate correnti)", # Deferred Tax Assets - typically current or split based on expected reversal
+    '44.NCA': "Imposte anticipate (considerate non correnti)",
+    '45': "Crediti verso altri (entro 12 mesi)",
+    '45.NCA': "Crediti verso altri (oltre 12 mesi)",
+    '46': "Partecipazioni in altre imprese (Attivo Circolante)", # Schema: C.III.1,2,3,4
+    '47': "Altri titoli (Attivo Circolante)", # Schema: C.III.6
+    '48': "Strumenti finanziari derivati attivi (Attivo Circolante)", # Not in current simple C.III range 46-48. Could be merged or need new pos.
+    # Schema C.III.5 Azioni Proprie (Attivo Circolante) not in current range 46-48
+    '49': "Depositi bancari e postali",
+    '50': "Assegni e denaro in cassa",
+    '51': "Ratei e Risconti attivi", # Note: Schema D includes "con separata indicazione del disaggio sui prestiti"
+    '52': "Capitale sociale",
+    '53': "Fondo di dotazione", # Was commented out, adding as per schema structure often includes it
+    '54': "Riserva da sovrapprezzo delle azioni",
+    '55': "Riserve di rivalutazione",
+    '56': "Riserva legale",
+    '57': "Riserve statutarie",
+    '58': "Altre riserve, distintamente indicate",
+    '59': "Riserva per operazioni di copertura di flussi finanziari attesi", # Was commented out
+    '60': "(Placeholder 60 - Riserve)",
+    '61': "(Placeholder 61 - Riserve)",
+    '62': "(Placeholder 62 - Riserve)",
+    '63': "(Placeholder 63 - Riserve)",
+    '64': "Utili (perdite) portati a nuovo",
+    '65': "Utile (perdita) dell'esercizio",
+    '66': "Riserva negativa per azioni proprie in portafoglio", # Schema A.VI "Riserva per azioni proprie in portafoglio" (usually positive here implies negative value if assets)
+    '67': "Fondi per imposte, anche differite",
+    '68': "Fondi per quiescenza e obblighi simili",
+    '69': "Altri fondi (Rischi e Oneri)",
+    '70': "Obbligazioni", # Will be split into 70.L / 70.S later
+    '71': "Obbligazioni convertibili", # Will be split into 71.L / 71.S later
+    '72': "Debiti verso soci per finanziamenti", # Will be split into 72.L / 72.S later
+    '73': "Debiti verso banche (oltre 12 mesi)",
+    '74': "Debiti verso altri finanziatori (oltre 12 mesi)",
+    '75': "Acconti da clienti (oltre 12 mesi)", # Passività
+    '76': "Debiti verso fornitori (oltre 12 mesi)",
+    '77': "Debiti rappresentati da titoli di credito (oltre 12 mesi)",
+    '78': "Debiti verso imprese del gruppo (oltre 12 mesi aggregate)", # Will be disaggregated later
+    '79': "Debiti verso fornitori (entro 12 mesi)",
+    '80': "Debiti verso banche (entro 12 mesi)",
+    '81': "Debiti verso altri finanziatori (entro 12 mesi)",
+    '82': "Acconti da clienti (entro 12 mesi)", # Passività
+    '83': "Debiti rappresentati da titoli di credito (entro 12 mesi)",
+    '84': "Debiti verso imprese del gruppo (entro 12 mesi aggregate)", # Will be disaggregated later
+    '85': "Debiti tributari", # Will be split 85.L / 85.S later
+    '86': "Debiti verso istituti di previdenza e sicurezza sociale", # Will be split 86.L / 86.S later
+    '87': "Altri debiti (entro 12 mesi)", # Or generic Altri Debiti, may need .L/.S split later
+    '88': "Ratei e Risconti passivi", # Note: Schema E includes "con separata indicazione dell'aggio sui prestiti"
+    '100': "Trattamento di fine rapporto di lavoro subordinato"
 }
 
 # Mapping for section titles displayed on input page
@@ -524,11 +508,11 @@ SECTION_TITLES = {
 
 # -- Start Automotive Mapping Data --
 CEE_TO_AUTOMOTIVE_CODES = {
-    1: ["0102000001"],
-    2: ["0102000005"],
-    4: ["0102000008"],
-    5: ["0102000010"],
-    7: [
+    '1': ["0102000001"],
+    '2': ["0102000005"],
+    '4': ["0102000008"],
+    '5': ["0102000010"],
+    '7': [
         "0102000030",
         "0102000040",
         "0102000041",
@@ -540,13 +524,13 @@ CEE_TO_AUTOMOTIVE_CODES = {
         "0102000051",
         "0102000052"
     ],
-    12: [
+    '12': [
         "0104000070",
         "0104000090",
         "0104000092",
         "0104000095"
     ],
-    13: [
+    '13': [
         "0104000015",
         "0104000020",
         "0104000021",
@@ -556,14 +540,14 @@ CEE_TO_AUTOMOTIVE_CODES = {
         "0104000100",
         "0104000140"
     ],
-    14: [
+    '14': [
         "0104000050",
-        "01040000110",
-        "01040000120",
-        "01040000130"
+        "01040000110", # Typo? 0104000110
+        "01040000120", # Typo? 0104000120
+        "01040000130"  # Typo? 0104000130
     ],
-    26: ["0106000011"],
-    30: [
+    '26': ["0106000011"],
+    '30': [
         "0106000041",
         "0106000050",
         "0106000051",
@@ -572,15 +556,15 @@ CEE_TO_AUTOMOTIVE_CODES = {
         "0106000055",
         "0106000056"
     ],
-    31: [
+    '31': [
         "0109000030",
         "0109000050",
         "0109000060",
         "0109000070",
-        "01090000150",
+        "01090000150", # Typo? 0109000150
         "0109000200"
     ],
-    34: [
+    '34': [
         "0109000001",
         "0109000003",
         "0109000004",
@@ -592,15 +576,16 @@ CEE_TO_AUTOMOTIVE_CODES = {
         "0109000020",
         "0109000025"
     ],
-    39: [
-        "0110",
+    '39': [ # This mapping will need to be re-evaluated based on current/non-current split for CEE pos 39
+        "0110", # Assuming this maps to current portion of '39'
         "0111",
         "0112",
         "0113",
         "0114000010",
         "0116"
     ],
-    43: [
+    # Need to consider '39.NCA' if automotive codes distinguish maturity for CEE 39
+    '43': [ # Similarly for CEE pos 43
         "0130000001",
         "0130000002",
         "0130000004",
@@ -619,7 +604,8 @@ CEE_TO_AUTOMOTIVE_CODES = {
         "0130000310",
         "0130000315"
     ],
-    45: [
+    # Need to consider '43.NCA'
+    '45': [ # Similarly for CEE pos 45
         "0130000005",
         "0130000020",
         "0130000021",
@@ -636,7 +622,9 @@ CEE_TO_AUTOMOTIVE_CODES = {
         "0130000601",
         "0130000602"
     ],
-    49: [
+    # Need to consider '45.NCA'
+    # Also for 40, 41, 42, 44 if they had mappings
+    '49': [
         "0153000001",
         "0153000002",
         "0153000003",
@@ -659,7 +647,7 @@ CEE_TO_AUTOMOTIVE_CODES = {
         "0153000052",
         "0153000053"
     ],
-    50: [
+    '50': [
         "0150000001",
         "0150000002",
         "0151000001",
@@ -667,7 +655,7 @@ CEE_TO_AUTOMOTIVE_CODES = {
         "0151000031",
         "0152000007"
     ],
-    51: [
+    '51': [
         "0160000010",
         "0160000025",
         "0160000030",
@@ -678,14 +666,14 @@ CEE_TO_AUTOMOTIVE_CODES = {
         "0160000070",
         "0160000075"
     ],
-    52: ["0310000010"],
-    54: ["0320000010"],
-    55: ["0320000041"],
-    56: ["0320000020"],
-    57: ["0320000021"],
-    58: ["0320000060"],
-    68: ["0210000011"],
-    73: [
+    '52': ["0310000010"],
+    '54': ["0320000010"],
+    '55': ["0320000041"],
+    '56': ["0320000020"],
+    '57': ["0320000021"],
+    '58': ["0320000060"],
+    '68': ["0210000011"], # Fondi per quiescenza e obblighi simili
+    '73': [ # Debiti v Banche OLTRE 12m
         "0220000020",
         "0220000030",
         "0220000031",
@@ -696,11 +684,11 @@ CEE_TO_AUTOMOTIVE_CODES = {
         "0220000065",
         "0220000090"
     ],
-    79: [
+    '79': [ # Debiti v Fornitori ENTRO 12m
         "0235",
         "0241"
     ],
-    80: [
+    '80': [ # Debiti v Banche ENTRO 12m
         "0270000001",
         "0270000005",
         "0270000006",
@@ -711,7 +699,7 @@ CEE_TO_AUTOMOTIVE_CODES = {
         "0270000015",
         "0270000016"
     ],
-    81: [
+    '81': [ # Debiti v Altri Finanziatori ENTRO 12m
         "0271000001",
         "0271000002",
         "0271000004",
@@ -724,7 +712,7 @@ CEE_TO_AUTOMOTIVE_CODES = {
         "0271000025",
         "0271000026"
     ],
-    85: [
+    '85': [ # Debiti Tributari (assuming current portion if not split in automotive codes)
         "0230000020",
         "0230000054",
         "0230000060",
@@ -734,15 +722,15 @@ CEE_TO_AUTOMOTIVE_CODES = {
         "0230000154",
         "0230000155"
     ],
-    86: [
+    '86': [ # Debiti v Istituti Previdenza (assuming current)
         "0230000070",
         "0230000090",
         "0230000160",
         "0230000180",
         "0230000185"
     ],
-    87: [
-        "02300000120",
+    '87': [ # Altri Debiti (assuming current)
+        "02300000120", # Typo? 0230000120
         "0230000201",
         "0230000202",
         "0230000205",
@@ -754,13 +742,13 @@ CEE_TO_AUTOMOTIVE_CODES = {
         "0230000216",
         "0231"
     ],
-    88: [
+    '88': [ # Risconti Passivi
         "0260000020",
         "0260000060",
         "0260000080",
         "0260000085"
     ],
-    100: [
+    '100': [ # TFR
         "0210000010",
         "0210000051",
         "0210000053",
@@ -777,23 +765,41 @@ AVAILABLE_MAPPINGS = {
     }
 }
 
+# Define _kpi_req_total_assets before it's used by POS_TOTAL_ASSETS
+_kpi_req_total_assets_constituents = (
+    [str(x) for x in get_all_positions(BALANCE_SHEET_STRUCTURE['assets']['non_current_assets']) if "(Placeholder" not in POSITION_NAMES.get(str(x), "")] +
+    [str(x) for x in get_all_positions(BALANCE_SHEET_STRUCTURE['assets']['current_assets']) if "(Placeholder" not in POSITION_NAMES.get(str(x), "")] +
+    [str(x) for x in get_all_positions(BALANCE_SHEET_STRUCTURE['assets']['prepaid_expenses_and_accrued_income']) if "(Placeholder" not in POSITION_NAMES.get(str(x), "")]
+)
+_kpi_req_total_assets = sorted(list(set(_kpi_req_total_assets_constituents)))
+
 # KPI position lists for calculation (already in constants.py but ensuring they are here)
 POS_CURRENT_ASSETS = [31, 32, 33, 34, 35, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50]
-POS_LIQUID_ASSETS = [39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50]
+POS_LIQUID_ASSETS = [39, 40, 41, 42, 43, 45]
 POS_CASH = [49, 50]
 POS_CURRENT_LIABILITIES = [79, 80, 81, 82, 83, 84, 85, 86, 87, 88]
 POS_TOTAL_LIABILITIES = [67, 68, 69, 100, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88]
-POS_TOTAL_EQUITY = [52, 54, 55, 56, 57, 58, 59, 64, 65, 66]
-POS_TOTAL_ASSETS = [1, 2, 3, 4, 5, 6, 7, 11, 12, 13, 14, 15, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51] 
+POS_TOTAL_EQUITY = [52, 53, 54, 55, 56, 57, 58, 59, 64, 65, 66]
+POS_TOTAL_ASSETS = _kpi_req_total_assets # Use the dynamically generated list
 
 # Dynamically define POS_ lists based on BALANCE_SHEET_STRUCTURE for clarity and maintainability
-POS_IMMOBILIZZAZIONI_IMMATERIALI = get_all_positions(BALANCE_SHEET_STRUCTURE['assets']['non_current_assets']['intangible_assets']) # B.I (1-10)
-POS_IMMOBILIZZAZIONI_MATERIALI = get_all_positions(BALANCE_SHEET_STRUCTURE['assets']['non_current_assets']['tangible_assets']) # B.II (11-25)
-POS_IMMOBILIZZAZIONI_FINANZIARIE = get_all_positions(BALANCE_SHEET_STRUCTURE['assets']['non_current_assets']['financial_investments_non_current']) # B.III (26-30)
-POS_IMMOBILIZZAZIONI_NETTE = sorted(list(set(POS_IMMOBILIZZAZIONI_IMMATERIALI + POS_IMMOBILIZZAZIONI_MATERIALI + POS_IMMOBILIZZAZIONI_FINANZIARIE))) # B.I + B.II + B.III
+_temp_imm_immat = get_all_positions(BALANCE_SHEET_STRUCTURE['assets']['non_current_assets']['intangible_assets'])
+POS_IMMOBILIZZAZIONI_IMMATERIALI = sorted([str(x) for x in _temp_imm_immat if "(Placeholder" not in POSITION_NAMES.get(str(x), "")])
 
-POS_DEBITI_TRIBUTARI = [BALANCE_SHEET_STRUCTURE['equity_liabilities']['liabilities']['tax_payables'][0]] if 'tax_payables' in BALANCE_SHEET_STRUCTURE['equity_liabilities']['liabilities'] and BALANCE_SHEET_STRUCTURE['equity_liabilities']['liabilities']['tax_payables'] else []
-POS_DEBITI_PREVIDENZIALI = [BALANCE_SHEET_STRUCTURE['equity_liabilities']['liabilities']['social_security_payables'][0]] if 'social_security_payables' in BALANCE_SHEET_STRUCTURE['equity_liabilities']['liabilities'] and BALANCE_SHEET_STRUCTURE['equity_liabilities']['liabilities']['social_security_payables'] else []
+_temp_imm_mat = get_all_positions(BALANCE_SHEET_STRUCTURE['assets']['non_current_assets']['tangible_assets'])
+POS_IMMOBILIZZAZIONI_MATERIALI = sorted([str(x) for x in _temp_imm_mat if "(Placeholder" not in POSITION_NAMES.get(str(x), "")])
+
+# POS_IMMOBILIZZAZIONI_FINANZIARIE does not have placeholders in its typical range 26-30, so no filter needed here, but ensure it's stringified
+POS_IMMOBILIZZAZIONI_FINANZIARIE = [str(x) for x in get_all_positions(BALANCE_SHEET_STRUCTURE['assets']['non_current_assets']['financial_investments_non_current'])]
+
+POS_IMMOBILIZZAZIONI_NETTE = sorted(list(set(
+    POS_IMMOBILIZZAZIONI_IMMATERIALI + # Already filtered and stringified
+    POS_IMMOBILIZZAZIONI_MATERIALI +   # Already filtered and stringified
+    POS_IMMOBILIZZAZIONI_FINANZIARIE # Already stringified
+)))
+
+POS_DEBITI_TRIBUTARI = [str(x) for x in BALANCE_SHEET_STRUCTURE['equity_liabilities']['liabilities']['tax_payables']]
+POS_DEBITI_PREVIDENZIALI = [str(x) for x in BALANCE_SHEET_STRUCTURE['equity_liabilities']['liabilities']['social_security_payables']]
 
 # New POS list for Long-term Debt
 POS_DEBITI_OLTRE_12_MESI = sorted(list(set(
@@ -807,7 +813,7 @@ POS_DEBITI_OLTRE_12_MESI = sorted(list(set(
 )))
 
 # New POS list for Current Financial Assets
-POS_ATTIVITA_FINANZIARIE_CORRENTI = get_all_positions(BALANCE_SHEET_STRUCTURE['assets']['current_assets']['current_financial_assets']) # C.III (46-48)
+POS_ATTIVITA_FINANZIARIE_CORRENTI = [str(x) for x in get_all_positions(BALANCE_SHEET_STRUCTURE['assets']['current_assets']['current_financial_assets'])]
 
 # Re-populate KPI_REQUIREMENTS with the new POS_ lists for accuracy
 # Ensure these lists are flat lists of unique integers.
@@ -816,52 +822,57 @@ _kpi_req_liquid_assets = [39, 40, 41, 42, 43, 45]
 _kpi_req_cash = [49, 50]
 _kpi_req_current_liabilities = [79, 80, 81, 82, 83, 84, 85, 86, 87, 88]
 _kpi_req_total_liabilities = [67, 68, 69, 100, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88]
-_kpi_req_total_equity = [52, 54, 55, 56, 57, 58, 59, 64, 65, 66]
-_kpi_req_total_assets = [1, 2, 3, 4, 5, 6, 7, 11, 12, 13, 14, 15, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51]
+_kpi_req_total_equity = [52, 53, 54, 55, 56, 57, 58, 59, 64, 65, 66]
 
 KPI_REQUIREMENTS = {
-    'current_ratio': sorted(list(set(_kpi_req_current_assets + _kpi_req_current_liabilities))),
-    'quick_ratio': sorted(list(set(_kpi_req_liquid_assets + _kpi_req_current_liabilities))),
-    'cash_ratio': sorted(list(set(_kpi_req_cash + _kpi_req_current_liabilities))),
-    'debt_to_equity': sorted(list(set(_kpi_req_total_liabilities + _kpi_req_total_equity))),
-    'debt_ratio': sorted(list(set(_kpi_req_total_liabilities + _kpi_req_total_assets))),
-    'working_capital': sorted(list(set(_kpi_req_current_assets + _kpi_req_current_liabilities))),
-    'asset_rigidity_index': sorted(list(set(POS_IMMOBILIZZAZIONI_NETTE + _kpi_req_total_assets))),
-    'asset_elasticity_index': sorted(list(set(_kpi_req_current_assets + _kpi_req_total_assets))),
-    'fixed_asset_coverage_ratio': sorted(list(set(_kpi_req_total_equity + POS_IMMOBILIZZAZIONI_NETTE))),
-    'tax_social_debt_on_assets_ratio': sorted(list(set(POS_DEBITI_TRIBUTARI + POS_DEBITI_PREVIDENZIALI + _kpi_req_total_assets))),
-    'tangible_net_worth': sorted(list(set(_kpi_req_total_equity + POS_IMMOBILIZZAZIONI_IMMATERIALI))),
-    'equity_multiplier': sorted(list(set(_kpi_req_total_assets + _kpi_req_total_equity))),
-    'long_term_debt_to_equity': sorted(list(set(POS_DEBITI_OLTRE_12_MESI + _kpi_req_total_equity))),
-    'intangible_assets_ratio': sorted(list(set(POS_IMMOBILIZZAZIONI_IMMATERIALI + _kpi_req_total_assets))),
-    'financial_assets_ratio': sorted(list(set(POS_IMMOBILIZZAZIONI_FINANZIARIE + POS_ATTIVITA_FINANZIARIE_CORRENTI + _kpi_req_total_assets))),
-    'non_current_assets_coverage': sorted(list(set(_kpi_req_total_equity + POS_DEBITI_OLTRE_12_MESI + POS_IMMOBILIZZAZIONI_NETTE))),
-    'net_working_capital_ratio': sorted(list(set(_kpi_req_current_assets + _kpi_req_current_liabilities + _kpi_req_total_assets)))
+    'current_ratio': sorted(list(set([str(x) for x in POS_CURRENT_ASSETS] + [str(y) for y in POS_CURRENT_LIABILITIES]))),
+    'quick_ratio': sorted(list(set( [str(x) for x in POS_LIQUID_ASSETS] + [str(x) for x in POS_CASH] + POS_ATTIVITA_FINANZIARIE_CORRENTI + [str(x) for x in POS_CURRENT_LIABILITIES] ))),
+    'cash_ratio': sorted(list(set([str(x) for x in POS_CASH] + [str(y) for y in POS_CURRENT_LIABILITIES]))),
+    'debt_to_equity': sorted(list(set([str(x) for x in POS_TOTAL_LIABILITIES] + [str(y) for y in POS_TOTAL_EQUITY]))),
+    'debt_ratio': sorted(list(set([str(x) for x in POS_TOTAL_LIABILITIES] + [str(y) for y in POS_TOTAL_ASSETS]))),
+    'working_capital': sorted(list(set([str(x) for x in POS_CURRENT_ASSETS] + [str(y) for y in POS_CURRENT_LIABILITIES]))),
+    'asset_rigidity_index': sorted(list(set([str(x) for x in POS_IMMOBILIZZAZIONI_NETTE] + [str(y) for y in POS_TOTAL_ASSETS]))),
+    'asset_elasticity_index': sorted(list(set([str(x) for x in POS_CURRENT_ASSETS] + [str(y) for y in POS_TOTAL_ASSETS]))),
+    'fixed_asset_coverage_ratio': sorted(list(set([str(x) for x in POS_TOTAL_EQUITY] + [str(y) for y in POS_IMMOBILIZZAZIONI_NETTE]))),
+    'tax_social_debt_on_assets_ratio': sorted(list(set([str(x) for x in POS_DEBITI_TRIBUTARI] + [str(y) for y in POS_DEBITI_PREVIDENZIALI] + [str(z) for z in POS_TOTAL_ASSETS]))),
+    'tangible_net_worth': sorted(list(set([str(x) for x in POS_TOTAL_EQUITY] + [str(y) for y in POS_IMMOBILIZZAZIONI_IMMATERIALI]))),
+    'equity_multiplier': sorted(list(set([str(x) for x in POS_TOTAL_ASSETS] + [str(y) for y in POS_TOTAL_EQUITY]))),
+    'long_term_debt_to_equity': sorted(list(set([str(x) for x in POS_DEBITI_OLTRE_12_MESI] + [str(y) for y in POS_TOTAL_EQUITY]))),
+    'intangible_assets_ratio': sorted(list(set([str(x) for x in POS_IMMOBILIZZAZIONI_IMMATERIALI] + [str(y) for y in POS_TOTAL_ASSETS]))),
+    'financial_assets_ratio': sorted(list(set(
+        [str(x) for x in POS_IMMOBILIZZAZIONI_FINANZIARIE] +
+        [str(x) for x in POS_ATTIVITA_FINANZIARIE_CORRENTI] +
+        [str(x) for x in POS_TOTAL_ASSETS]
+    ))),
+    'non_current_assets_coverage': sorted(list(set(
+        [str(x) for x in POS_TOTAL_EQUITY] +
+        [str(x) for x in POS_DEBITI_OLTRE_12_MESI] +
+        [str(x) for x in POS_IMMOBILIZZAZIONI_NETTE]
+    ))),
+    'net_working_capital_ratio': sorted(list(set([str(x) for x in POS_CURRENT_ASSETS] + [str(y) for y in POS_CURRENT_LIABILITIES] + [str(z) for z in POS_TOTAL_ASSETS])))
 }
 
-# New: Total Liabilities Excluding TFR (pos 100)
-POS_TOTAL_LIABILITIES_EXCL_TFR = sorted([p for p in POS_TOTAL_LIABILITIES if p != 100])
+# New: Total Liabilities Excluding TFR (pos '100')
+POS_TOTAL_LIABILITIES_EXCL_TFR = sorted([str(p) for p in POS_TOTAL_LIABILITIES if str(p) != '100'])
 
-# New KPI: Debt to Equity Excluding TFR
-KPI_REQUIREMENTS['debt_to_equity_excl_tfr'] = sorted(list(set(POS_TOTAL_LIABILITIES_EXCL_TFR + POS_TOTAL_EQUITY)))
-
-# New KPI: Debt Ratio Excluding TFR
-KPI_REQUIREMENTS['debt_ratio_excl_tfr'] = sorted(list(set(POS_TOTAL_LIABILITIES_EXCL_TFR + _kpi_req_total_assets)))
+# Update KPIs that exclude TFR
+KPI_REQUIREMENTS['debt_to_equity_excl_tfr'] = sorted(list(set([str(x) for x in POS_TOTAL_LIABILITIES_EXCL_TFR] + [str(y) for y in POS_TOTAL_EQUITY])))
+KPI_REQUIREMENTS['debt_ratio_excl_tfr'] = sorted(list(set([str(x) for x in POS_TOTAL_LIABILITIES_EXCL_TFR] + [str(y) for y in POS_TOTAL_ASSETS])))
 
 # Exported for calculator.py (ensure all needed are here)
 __all__ = [
     'BALANCE_SHEET_STRUCTURE', 'ALL_POSITIONS', 'KPI_REQUIREMENTS', 'AVAILABLE_KPIS',
     'POSITION_NAMES', 'SECTION_TITLES', 'CEE_TO_AUTOMOTIVE_CODES', 'AVAILABLE_MAPPINGS',
     'get_all_positions',
-    # Original POS lists (ensure they are defined above or remove if fully replaced by dynamic ones)
-    'POS_CURRENT_ASSETS', 'POS_LIQUID_ASSETS', 'POS_CASH', 
-    'POS_CURRENT_LIABILITIES', 'POS_TOTAL_LIABILITIES', 'POS_TOTAL_EQUITY', 
+    # Main POS lists
+    'POS_CURRENT_ASSETS', 'POS_LIQUID_ASSETS', 'POS_CASH',
+    'POS_CURRENT_LIABILITIES', 'POS_TOTAL_LIABILITIES', 'POS_TOTAL_EQUITY',
     'POS_TOTAL_ASSETS',
-    # New dynamically defined POS lists
+    # Dynamically defined POS lists
     'POS_IMMOBILIZZAZIONI_IMMATERIALI', 'POS_IMMOBILIZZAZIONI_MATERIALI',
     'POS_IMMOBILIZZAZIONI_FINANZIARIE', 'POS_IMMOBILIZZAZIONI_NETTE',
     'POS_DEBITI_TRIBUTARI', 'POS_DEBITI_PREVIDENZIALI',
-    'POS_DEBITI_OLTRE_12_MESI',
+    'POS_DEBITI_OLTRE_12_MESI', 'POS_DEBITI_FINANZIARI_OLTRE_12_MESI',
     'POS_ATTIVITA_FINANZIARIE_CORRENTI',
     'POS_TOTAL_LIABILITIES_EXCL_TFR'
 ] 
