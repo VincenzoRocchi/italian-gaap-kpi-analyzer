@@ -1,7 +1,7 @@
 [project]
 name = "kpi-cee"
 version = "0.2.8"
-description = "A desktop application to calculate Key Performance Indicators (KPIs) from Italian GAAP-compliant financial statements."
+description = "A Web application to calculate Key Performance Indicators (KPIs) from Italian GAAP-compliant financial statements."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
@@ -9,4 +9,5 @@ dependencies = [
     "pytest>=8.0.0",
     "pyinstaller>=6.0.0",
     "weasyprint>=65.0.0",
+    "flask-weasyprint>=1.1.0",
 ]
