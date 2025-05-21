@@ -474,6 +474,18 @@ hr.mb-4 {
         padding-right: 0 !important;
         margin-bottom: 0; /* Reduce margin if details are directly part of card */
     }
+
+    /* Fix for overlapping KPI tiles in print layout */
+    body.print-full-report .row.row-cols-1.g-4 {
+        display: block !important; /* Override flex display */
+    }
+    
+    body.print-full-report .row.row-cols-1.g-4 > .col {
+        width: 100% !important;
+        margin-bottom: 20px !important; /* Add space between KPI cards */
+        page-break-inside: avoid; /* Try to avoid breaking cards across pages */
+    }
+
     body.print-full-report .original-kpi-input-accordion {
         display: none !important; /* Hide the original accordion from right column */
     }
@@ -541,5 +553,31 @@ hr.mb-4 {
     /* Hide accordion toggles that might be part of the original accordion if it wasn't fully hidden */
     body.print-full-report #inputDataAccordion .accordion-button::after {
         display: none !important;
+    }
+
+    /* Additional print layout fixes */
+    @page {
+        margin: 1cm; /* Set reasonable page margins */
+    }
+    
+    /* Ensure each KPI card starts on a new page if needed */
+    body.print-full-report .row.row-cols-1.g-4 > .col {
+        page-break-before: auto; /* Allow a break before if needed */
+        page-break-after: auto; /* Allow a break after if needed */
+        page-break-inside: avoid; /* Try to keep the card together */
+    }
+    
+    /* Improve spacing and avoid overlaps in the KPI print input grid */
+    body.print-full-report .kpi-print-input-grid-container {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr); /* Two equal columns */
+        gap: 5px 15px; /* Increased gaps for better readability */
+        margin-top: 10px; /* Add some space at the top */
+    }
+    
+    /* Ensure each print input item has enough space */
+    body.print-full-report .kpi-print-input-item {
+        padding: 3px 0; /* Slightly more vertical padding */
+        min-height: 24px; /* Ensure minimum height for each item */
     }
 } 

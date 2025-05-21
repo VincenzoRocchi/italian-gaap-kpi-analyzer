@@ -36,7 +36,9 @@ def validate_financial_data(form_data, required_positions):
         except ValueError:
             # Default to 0.0 if conversion fails
             validated_data[pos_str] = 0.0
-            errors[field_name] = f"Invalid numeric value for position {pos}"
+            # Store the original input value for preservation
+            validated_data[f"raw_{pos_str}"] = form_data.get(field_name, '0')
+            errors[field_name] = f"Valore non valido. Inserire un numero (es. 1234,56)"
     
     return validated_data, errors
 

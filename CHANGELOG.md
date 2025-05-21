@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.3 Beta] - 2025-05-21
+
+### Added
+- Implemented server-side session management using Flask-Session to resolve browser cookie size limitations
+- Added functionality to preserve user input data when validation errors occur
+- Added visual feedback for validation errors by highlighting invalid input fields in red
+- Improved user experience with field-specific error messages that clear when the user starts typing
+
+### Fixed
+- Resolved issue with data not being kept in memory when validation errors occur
+- Updated deprecated datetime.utcnow() to use timezone-aware datetime.now(UTC)
+- Fixed print layout issues with overlapping KPI tiles when printing complete reports
+- Improved position name display in results page to avoid "Nome non trovato" messages
+
 ## [0.3.2 Beta] - 2025-05-14
 
 ### Changed

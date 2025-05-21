@@ -3,12 +3,17 @@
     <label for="pos_{{ pos }}" class="form-label">
         Pos. {{ pos }}: {{ position_names.get(pos, 'Nome Posizione Mancante') }}
     </label>
-    <input type="text" class="form-control form-control-sm"
+    <input type="text" class="form-control form-control-sm {% if 'pos_' + pos in errors %}is-invalid{% endif %}"
            id="pos_{{ pos }}"
            name="pos_{{ pos }}"
            {# Use default filter to handle None or missing values gracefully #}
            value="{{ data.get(pos|string)|default('', true) }}"
            placeholder="0.00">
+    {% if 'pos_' + pos in errors %}
+    <div class="invalid-feedback">
+        {{ errors['pos_' + pos] }}
+    </div>
+    {% endif %}
     {# Div to hold the mapping details - populated by JavaScript #}
     <div id="mapping-{{ pos }}" class="internal-mapping-details mt-1 text-muted small" style="display: none;">
         {# Content added by JS based on dropdown selection #}

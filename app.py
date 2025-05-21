@@ -1,8 +1,9 @@
 from flask import Flask, render_template, request, session, redirect, url_for, flash
 import os
-from datetime import datetime
+from datetime import datetime, UTC
 import json
 import collections # Import collections for defaultdict
+from flask_session import Session  # Import Flask-Session
 
 # Import from our modules
 from app_logic.constants import (
@@ -23,14 +24,21 @@ app = Flask(__name__)
 # Secret key for session management. Replace with a strong, random key in production.
 app.secret_key = os.environ.get('SECRET_KEY', os.urandom(24))
 
+# Configure server-side session
+app.config['SESSION_TYPE'] = 'filesystem'
+app.config['SESSION_FILE_DIR'] = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'flask_session')
+app.config['SESSION_PERMANENT'] = False
+app.config['SESSION_USE_SIGNER'] = True
+Session(app)
+
 # Context Processor to make datetime available in templates
 @app.context_processor
 def inject_now():
-    return {'now': datetime.utcnow()} # Use utcnow for consistency
+    return {'now': datetime.now(UTC)}  # Use timezone-aware UTC time instead of utcnow
 
 @app.context_processor
 def inject_app_version():
-    return {'app_version': "0.3.2 Beta"} # Inject app version
+    return {'app_version': "0.3.3 Beta"} # Inject app version
 
 @app.after_request
 def add_security_headers(response):
@@ -93,6 +101,10 @@ def input_required_fields():
         session['required_positions'] = sorted_required_positions
         session['selected_kpis'] = selected_kpi_keys
         
+        # Clear any previous raw input data
+        if 'raw_input_data' in session:
+            session.pop('raw_input_data', None)
+            
         existing_data = session.get('balance_sheet_data', {})
         current_balance_sheet_data = {str(pos): existing_data.get(str(pos), 0.0) for pos in sorted_required_positions}
         session['balance_sheet_data'] = current_balance_sheet_data
@@ -106,6 +118,24 @@ def input_required_fields():
         
         if 'balance_sheet_data' not in session:
              session['balance_sheet_data'] = {str(pos): 0.0 for pos in session.get('required_positions', [])}
+        elif 'raw_input_data' in session:
+            # If we have raw_input_data, merge it with balance_sheet_data to preserve user input
+            # even for invalid values
+            raw_data = session.get('raw_input_data', {})
+            for pos in session['required_positions']:
+                pos_str = str(pos)
+                field_name = f'pos_{pos}'
+                if field_name in raw_data:
+                    # Try to use the original raw string values for form fields
+                    try:
+                        # Try to convert to float for the internal representation
+                        value_str = raw_data[field_name].replace(',', '.')
+                        session['balance_sheet_data'][pos_str] = float(value_str)
+                    except ValueError:
+                        # If not a valid float, keep the raw value anyway for display purposes
+                        session['balance_sheet_data'][f"raw_{pos_str}"] = raw_data[field_name]
+            # Clear raw_input_data after using it
+            session.pop('raw_input_data', None)
 
     selected_kpi_keys = session.get('selected_kpis', [])
     sorted_required_positions = session.get('required_positions', [])
@@ -157,7 +187,8 @@ def input_required_fields():
                            selected_kpi_details=selected_kpi_details, 
                            section_titles=SECTION_TITLES,
                            available_mappings=AVAILABLE_MAPPINGS, 
-                           all_mapping_data_json=json.dumps(all_mapping_data)
+                           all_mapping_data_json=json.dumps(all_mapping_data),
+                           errors=session.get('validation_errors', {})
                            )
 
 @app.route('/calculate', methods=['POST'])
@@ -170,11 +201,26 @@ def calculate():
     selected_kpi_keys = session['selected_kpis']
 
     try:
+        # Store the raw form data first to preserve it in case of validation errors
+        raw_form_data = {}
+        for pos in required_positions:
+            field_name = f'pos_{pos}'
+            if field_name in request.form:
+                raw_form_data[field_name] = request.form[field_name]
+        
+        session['raw_input_data'] = raw_form_data
+        
         balance_sheet_data, errors = validate_financial_data(request.form, required_positions)
         if errors:
-            for field_name, error_message in errors.items():
-                flash(f"{error_message}", "warning")
+            # We no longer need flash messages for each error as they're displayed inline
+            # Save what data was valid to preserve user input
+            session['balance_sheet_data'] = {k: v for k, v in balance_sheet_data.items()}
+            # Store validation errors in session to highlight fields
+            session['validation_errors'] = errors
             return redirect(url_for('input_required_fields'))
+        # Clear any validation errors if successful
+        if 'validation_errors' in session:
+            session.pop('validation_errors', None)
         session['balance_sheet_data'] = balance_sheet_data
         
     except Exception as e:
@@ -205,11 +251,12 @@ def calculate():
         # Create a flat list of all unique positions required by any selected KPI for display
         # This is for the "Dati Inseriti per KPI" section which is separate from individual KPI cards now
         
-        for pos_key in sorted(required_positions, key=lambda x: str(x)): # pos_key is already a string
-            value = balance_sheet_data.get(pos_key, 0.0) # Use string pos_key directly
-            name = POSITION_NAMES.get(pos_key, f"Position {pos_key}") # Use string pos_key directly
+        for pos in sorted(required_positions, key=lambda x: str(x)):
+            pos_str = str(pos)
+            value = balance_sheet_data.get(pos_str, 0.0)
+            name = POSITION_NAMES.get(pos_str, POSITION_NAMES.get(pos, f"Position {pos}"))
             kpi_input_details[kpi_key].append({
-                'position': pos_key,
+                'position': pos_str,
                 'name_display': name,
                 'value': value
             })
