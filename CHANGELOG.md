@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.4 Beta] - 2025-05-21
+
+### Added
+- **UI (KPI Selection Page):**
+    - Added "Select All" and "Deselect All" buttons for KPI selection.
+    - Added a "Procedi all'Inserimento Dati" button at the top of the KPI selection page, positioned on the same horizontal line as the "Select/Deselect All" buttons (select/deselect on the left, proceed on the right).
+
+### Changed
+- **Refactoring:** Split the main `app_logic/constants.py` file into multiple, more focused configuration files (`balance_sheet_config.py`, `kpi_config.py`, `mappings_config.py`, `kpi_requirements_logic.py`) to improve code organization and maintainability. The original `constants.py` now imports from these new files.
+
+### Fixed
+- **UI (Print):** Resolved vertical overlap issue in the KPI summary print view, ensuring KPI cards stack correctly.
+
 ## [0.3.3 Beta] - 2025-05-21
 
 ### Added

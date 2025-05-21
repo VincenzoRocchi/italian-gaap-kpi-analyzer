@@ -9,6 +9,24 @@
         <hr>
         <p class="text-muted mb-4">Scegli uno o più indicatori cliccando sulle relative schede. Verranno richiesti solo i dati necessari per i calcoli selezionati.</p>
 
+        {# Buttons for Select/Deselect All and Proceed on the same line #}
+        <div class="mb-3 d-flex justify-content-between align-items-center">
+            {# Group for Select/Deselect All buttons on the left #}
+            <div>
+                <button type="button" class="btn btn-outline-primary me-2" id="selectAllKpisButton">
+                    <i class="bi bi-check-square-fill me-1"></i> Seleziona Tutti
+                </button>
+                <button type="button" class="btn btn-outline-secondary" id="deselectAllKpisButton">
+                    <i class="bi bi-square me-1"></i> Deseleziona Tutti
+                </button>
+            </div>
+
+            {# Proceed button on the right #}
+            <div>
+                <button type="submit" class="btn btn-primary">Procedi all'Inserimento Dati <i class="bi bi-arrow-right-circle-fill ms-1"></i></button>
+            </div>
+        </div>
+
         {# KPI Tiles using Bootstrap Grid and Cards - Now Grouped #}
         {% for category_name, kpis_in_category in grouped_kpis.items() %}
             <h3 class="mt-4 mb-3">{{ category_name }}</h3>
@@ -64,5 +82,28 @@ var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
     html: true // Allow HTML content in tooltips
   })
 })
+
+// Select/Deselect All KPIs
+document.addEventListener('DOMContentLoaded', function() {
+    const selectAllButton = document.getElementById('selectAllKpisButton');
+    const deselectAllButton = document.getElementById('deselectAllKpisButton');
+    const kpiCheckboxes = document.querySelectorAll('input[name="kpi_keys"]');
+
+    if (selectAllButton) {
+        selectAllButton.addEventListener('click', function() {
+            kpiCheckboxes.forEach(function(checkbox) {
+                checkbox.checked = true;
+            });
+        });
+    }
+
+    if (deselectAllButton) {
+        deselectAllButton.addEventListener('click', function() {
+            kpiCheckboxes.forEach(function(checkbox) {
+                checkbox.checked = false;
+            });
+        });
+    }
+});
 </script>
 {% endblock %} 

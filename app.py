@@ -37,8 +37,9 @@ def inject_now():
     return {'now': datetime.now(UTC)}  # Use timezone-aware UTC time instead of utcnow
 
 @app.context_processor
-def inject_app_version():
-    return {'app_version': "0.3.3 Beta"} # Inject app version
+def inject_globals():
+    """Inject global variables into templates."""
+    return {'app_version': "0.3.4 Beta"} # Inject app version
 
 @app.after_request
 def add_security_headers(response):

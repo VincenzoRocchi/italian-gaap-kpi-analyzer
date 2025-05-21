@@ -459,6 +459,36 @@ hr.mb-4 {
         display: none !important; /* Ensure hidden in summary view */
     }
 
+    /* Ensure each KPI card in summary print takes full width and has spacing */
+    body.print-summary .row.row-cols-1.g-4 {
+        display: block !important; /* Override Bootstrap's flex display for printing */
+        margin-left: 0 !important; /* Reset potential negative margins from .row */
+        margin-right: 0 !important;
+    }
+
+    body.print-summary .row.row-cols-1.g-4 > .col {
+        display: block !important;   /* Treat as a block element */
+        width: 100% !important;      /* Ensure full width */
+        max-width: 100% !important;
+        height: auto !important;     /* Height based on content */
+        padding-left: 0 !important;  /* Remove Bootstrap gutter padding */
+        padding-right: 0 !important; /* Remove Bootstrap gutter padding */
+        margin-left: 0 !important;   /* Reset any horizontal margins */
+        margin-right: 0 !important;
+        margin-bottom: 20px !important; /* Increased vertical spacing */
+        overflow: visible !important;/* Ensure content isn't clipped */
+        page-break-inside: avoid;    /* Try to keep card content on one page */
+        border: 1px solid #f0f0f0 !important; /* Light border for debugging bounds of .col */
+    }
+
+    /* Specifically target the .card within the .col for print summary */
+    body.print-summary .row.row-cols-1.g-4 > .col > .card {
+        height: auto !important; /* Override Bootstrap h-100 or other fixed heights */
+        margin-bottom: 0 !important; /* Margin is handled by the .col wrapper */
+        border: 1px dotted blue !important; /* Debugging border for the card itself */
+        box-shadow: none !important; /* Ensure no shadow in summary print for cards */
+    }
+
     /* --- Styles for Full Report Print --- */
     body.print-full-report .row > [class*="col-"] { /* Target all columns in a row */
         flex: 0 0 100% !important;
