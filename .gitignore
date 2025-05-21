@@ -10,3 +10,6 @@ uv.lock
 
 # Virtual environments
 .venv
+
+# Flask session files
+flask_session/*
