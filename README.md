@@ -21,6 +21,32 @@ This is an open-source project, free to use, modify, and distribute. Use it as a
 - **Detailed Results**: View calculated KPIs with interpretations.
 - **PDF Export**: Print KPI results (summary or full report with input data) to PDF directly from your browser.
 
+## Demo Screenshots
+
+Below are example screenshots demonstrating the main features and workflow of the KPI Analyzer:
+
+*The data utilized in these screenshots is available in the `demo-screenshots/data` folder.*
+
+### KPI Selection
+
+![KPI Selection](demo-screenshots/selezione kpi.png)
+*Choose which KPIs to calculate from the available list.*
+
+### Data Entry
+
+![Data Entry](demo-screenshots/inserimento dati.png)
+*Enter the required financial statement data for KPI calculation.*
+
+### KPI Selection (Scrolled)
+
+![KPI Selection Scrolled](demo-screenshots/selezione kpi_1.png)
+*View of the KPI selection page after scrolling down to see more options.*
+
+### Results
+
+![Results](demo-screenshots/risultati.png)
+*View the calculated KPIs and their interpretations.*
+
 ## Getting Started
 
 There are two main ways to use KPI CEE:
@@ -29,10 +55,10 @@ There are two main ways to use KPI CEE:
 
 Download ready-to-run executables for Windows and Linux. For macOS, running from source (see below) is the recommended method.
 
-1.  Go to the **[Releases Page](https://github.com/VincenzoRocchi/kpi_cee/releases)**.
-2.  Download the archive for your OS (e.g., `kpi_cee-windows.zip` or `kpi_cee-linux.tar.gz`).
-3.  Extract the archive.
-4.  Run the `kpi_cee` executable found inside the extracted folder.
+1. Go to the **[Releases Page](https://github.com/VincenzoRocchi/kpi_cee/releases)**.
+2. Download the archive for your OS (e.g., `kpi_cee-windows.zip` or `kpi_cee-linux.tar.gz`).
+3. Extract the archive.
+4. Run the `kpi_cee` executable found inside the extracted folder.
 
 For more detailed OS-specific instructions, see the **[Installation Guide in our Docs](./docs/01_installation.md)** (Note: macOS executable instructions may be outdated).
 
@@ -44,53 +70,64 @@ This gives you more flexibility, is the best way to get the latest updates, and 
 
 `uv` is an extremely fast Python package installer and project manager, written in Rust. It can be used as a significantly faster alternative to `pip` and `venv`.
 
-*   **macOS and Linux:**
+- **macOS and Linux:**
+
     ```bash
     curl -LsSf https://astral.sh/uv/install.sh | sh
     ```
-*   **Windows (PowerShell):**
+
+- **Windows (PowerShell):**
+
     ```bash
     powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
     ```
-*   Alternatively, install via pip: `pip install uv` or `pipx install uv`.
+
+- Alternatively, install via pip: `pip install uv` or `pipx install uv`.
 
 For more installation options, see the [official `uv` installation guide](https://docs.astral.sh/uv/getting-started/installation/).
 
 #### Setup Steps
 
-1.  **Prerequisites:**
-    *   **Python:** Version 3.10 or newer is recommended.
-        *   **macOS:** The easiest way to install Python is using [Homebrew](https://brew.sh/). Once Homebrew is installed, run: `brew install python`
-        *   **Windows/Linux:** Download from the [official Python website](https://www.python.org/downloads/) or use your system's package manager (e.g., `apt` on Debian/Ubuntu).
-    *   **Git:** To clone the repository. ([Install Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)).
+1. **Prerequisites:**
+    - **Python:** Version 3.10 or newer is recommended.
+        - **macOS:** The easiest way to install Python is using [Homebrew](https://brew.sh/). Once Homebrew is installed, run: `brew install python`
+        - **Windows/Linux:** Download from the [official Python website](https://www.python.org/downloads/) or use your system's package manager (e.g., `apt` on Debian/Ubuntu).
+    - **Git:** To clone the repository. ([Install Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)).
 
-2.  **Clone the repository:**
+2. **Clone the repository:**
+
     ```bash
     git clone https://github.com/VincenzoRocchi/kpi_cee.git
     cd kpi_cee
     ```
 
-3.  **Set up a Python virtual environment:**
-    *   **Using `uv` (Recommended):**
+3. **Set up a Python virtual environment:**
+    - **Using `uv` (Recommended):**
+
         ```bash
         uv venv
         # Activate the environment (uv will show the command, usually:)
         # On macOS/Linux: source .venv/bin/activate
         # On Windows: .venv\Scripts\activate
         ```
-    *   **Using standard `venv`:**
+
+    - **Using standard `venv`:**
+
         ```bash
         python -m venv venv
         # On Windows: venv\Scripts\activate
         # On macOS/Linux: source venv/bin/activate
         ```
 
-4.  **Install dependencies:**
-    *   **Using `uv` (Recommended, installs from `pyproject.toml`):
+4. **Install dependencies:**
+    - **Using `uv` (Recommended, installs from `pyproject.toml`):
+
         ```bash
         uv pip install -e .
         ```
-    *   **Using `pip` (installs Flask from `requirements.txt`):
+
+    - **Using `pip` (installs Flask from `requirements.txt`):
+
         ```bash
         pip install -r requirements.txt 
         # Note: For development tools like pytest and PyInstaller, 
@@ -98,21 +135,26 @@ For more installation options, see the [official `uv` installation guide](https:
         # or if they are removed from pyproject.toml's main dependencies in the future.
         ```
 
-5.  **Set `SECRET_KEY` (Rarely Needed for Local Use):**
+5. **Set `SECRET_KEY` (Rarely Needed for Local Use):**
     Flask uses a `SECRET_KEY` for session management. This application will automatically generate a temporary key if one isn't set, which is perfectly fine for its typical local, in-memory operation. If you have a specific need to set it (e.g., advanced session testing), you can do so:
-    *   macOS/Linux (in your terminal):
+    - macOS/Linux (in your terminal):
+
         ```bash
         export SECRET_KEY='my_local_dev_key'
         ```
-    *   Windows (Command Prompt):
+
+    - Windows (Command Prompt):
+
         ```bash
         set SECRET_KEY=my_local_dev_key
         ```
 
-6.  **Run the application:**
+6. **Run the application:**
+
     ```bash
     python app.py
     ```
+
     Open your browser and go to `http://127.0.0.1:5001`.
 
 For further details, refer to the **[Installation Guide for Running from Source](./docs/01_installation.md#option-2-running-from-source-code)**.
@@ -145,9 +187,10 @@ Contributions, suggestions, and bug reports are welcome! Please see our **[Contr
 
 If you're contributing or modifying the code:
 
-*   Follow the "Running from Source" steps above to set up your environment, preferably using `uv`.
-*   If you used `uv pip install -e .` or installed the project from `pyproject.toml`, development tools like `pytest` (for testing) and `PyInstaller` (for building executables, if you choose to) are already installed as they are listed in `pyproject.toml`.
-*   Run tests using Pytest:
+- Follow the "Running from Source" steps above to set up your environment, preferably using `uv`.
+- If you used `uv pip install -e .` or installed the project from `pyproject.toml`, development tools like `pytest` (for testing) and `PyInstaller` (for building executables, if you choose to) are already installed as they are listed in `pyproject.toml`.
+- Run tests using Pytest:
+
     ```bash
     pytest
     ```
