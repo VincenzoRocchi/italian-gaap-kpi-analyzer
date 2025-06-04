@@ -158,4 +158,4 @@ This project uses GitHub Actions to automatically build executables for Windows 
 
 ## Roadmap / Future Enhancements
 
-(To be defined - consider adding items like: more KPIs, data import/export, charts, user accounts, etc.)
+(To be defined )
