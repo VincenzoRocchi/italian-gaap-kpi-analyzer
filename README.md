@@ -7,6 +7,22 @@
 
 **A web application to calculate Key Performance Indicators (KPIs) from Italian GAAP-compliant financial statements.**
 
+## Table of Contents
+- [About The Project](#about-the-project)
+- [Features](#features)
+- [Demo Screenshots](#demo-screenshots)
+- [Getting Started](#getting-started)
+- [How to Use](#how-to-use)
+- [Building Your Own Executable](#building-your-own-executable)
+- [Documentation](#documentation)
+- [Dependencies](#dependencies)
+- [License](#license)
+- [Contributing](#contributing)
+- [Development](#development)
+- [CI/CD Pipeline (Automated Releases)](#cicd-pipeline-automated-releases)
+- [Roadmap / Future Enhancements](#roadmap--future-enhancements)
+- [Contact](#contact)
+
 ## About The Project
 
 KPI CEE is a Flask-based web tool designed for financial analysts, accountants, students, and business owners. It simplifies the analysis of financial statements by automatically calculating key financial ratios and KPIs based on the structure defined by the Italian Civil Code (Art. 2424 Codice Civile - CEE format).
@@ -29,22 +45,22 @@ Below are example screenshots demonstrating the main features and workflow of th
 
 ### KPI Selection
 
-![KPI Selection](demo-screenshots/selezione kpi.png)
+![Screenshot of KPI selection page, showing available KPIs to choose](demo-screenshots/selezione%20kpi.png)
 *Choose which KPIs to calculate from the available list.*
-
-### Data Entry
-
-![Data Entry](demo-screenshots/inserimento dati.png)
-*Enter the required financial statement data for KPI calculation.*
 
 ### KPI Selection (Scrolled)
 
-![KPI Selection Scrolled](demo-screenshots/selezione kpi_1.png)
+![Screenshot of KPI selection page after scrolling, showing more KPI options](demo-screenshots/selezione%20kpi_1.png)
 *View of the KPI selection page after scrolling down to see more options.*
+
+### Data Entry
+
+![Screenshot of data entry page, where users input financial statement data](demo-screenshots/inserimento%20dati.png)
+*Enter the required financial statement data for KPI calculation.*
 
 ### Results
 
-![Results](demo-screenshots/risultati.png)
+![Screenshot of results page, displaying calculated KPIs and their interpretations](demo-screenshots/risultati.png)
 *View the calculated KPIs and their interpretations.*
 
 ## Getting Started
@@ -68,23 +84,7 @@ This gives you more flexibility, is the best way to get the latest updates, and 
 
 #### Installing `uv` (Recommended Package Installer)
 
-`uv` is an extremely fast Python package installer and project manager, written in Rust. It can be used as a significantly faster alternative to `pip` and `venv`.
-
-- **macOS and Linux:**
-
-    ```bash
-    curl -LsSf https://astral.sh/uv/install.sh | sh
-    ```
-
-- **Windows (PowerShell):**
-
-    ```bash
-    powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
-    ```
-
-- Alternatively, install via pip: `pip install uv` or `pipx install uv`.
-
-For more installation options, see the [official `uv` installation guide](https://docs.astral.sh/uv/getting-started/installation/).
+We recommend using [`uv`](https://docs.astral.sh/uv/getting-started/installation/) for fast Python package management. Please refer to the [official uv installation guide](https://docs.astral.sh/uv/getting-started/installation/) or a [YouTube tutorial](https://www.youtube.com/results?search_query=python+uv+installer) for up-to-date installation instructions.
 
 #### Setup Steps
 
@@ -159,6 +159,14 @@ For more installation options, see the [official `uv` installation guide](https:
 
 For further details, refer to the **[Installation Guide for Running from Source](./docs/01_installation.md#option-2-running-from-source-code)**.
 
+## How to Use
+
+1. Open your browser and go to `http://127.0.0.1:5001` after starting the application.
+2. Select the KPIs you want to calculate from the list.
+3. Enter the required financial statement data.
+4. View the calculated KPIs and their interpretations on the results page.
+5. Optionally, export the results to PDF.
+
 ## Building Your Own Executable
 
 If you've modified the code or want to package it yourself, you can build your own executables using PyInstaller.
@@ -201,4 +209,13 @@ This project uses GitHub Actions to automatically build executables for Windows 
 
 ## Roadmap / Future Enhancements
 
-(To be defined )
+Planned features and improvements:
+
+- Double language support (English/Italian)
+- Possible support for additional balance sheet standards (e.g., IFRS)
+- More mappings and the ability to standardize them for various use cases
+- User-customizable mappings (users can implement their own mapping logic if needed)
+
+## Contact
+
+For questions, support, or suggestions, please open an issue on the [GitHub Issues page](https://github.com/VincenzoRocchi/kpi_cee/issues) or contact the maintainer via the email listed in the repository profile.

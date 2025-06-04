@@ -7,7 +7,7 @@ At this stage, the project is primarily maintained by the initial author. Howeve
 ## How to Contribute
 
 1.  **Reporting Bugs:**
-    *   Please open an issue on the [GitHub Issues page](https://github.com/yourusername/kpi_cee/issues) (replace with actual repo path).
+    *   Please open an issue on the [GitHub Issues page](https://github.com/VincenzoRocchi/kpi_cee/issues) (replace with actual repo path).
     *   Describe the bug in detail, including steps to reproduce, expected behavior, and actual behavior.
     *   Include information about your operating system and Python version if relevant.
 
