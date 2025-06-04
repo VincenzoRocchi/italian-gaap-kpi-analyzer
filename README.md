@@ -1,221 +1,222 @@
-# italian-gaap-kpi-analyzer (KPI Calculator for Italian Financial Statements) - Version 0.3.x
+<!-- An English version of this README is available here: [README.en.md](./README.en.md) -->
 
-<!-- Badges: License, Python Version, Flask Version -->
-![License](https://img.shields.io/github/license/VincenzoRocchi/kpi_cee)
-![Python Version](https://img.shields.io/badge/python-3.12-blue)
-![Flask Version](https://img.shields.io/badge/flask-3.1.0-blue)
+# italian-gaap-kpi-analyzer (Calcolatore KPI per Bilanci Italiani) - Versione 0.3.x
 
-**A web application to calculate Key Performance Indicators (KPIs) from Italian GAAP-compliant financial statements.**
+<!-- Badge: Licenza, Versione Python, Versione Flask -->
+![Licenza](https://img.shields.io/github/license/VincenzoRocchi/kpi_cee)
+![Versione Python](https://img.shields.io/badge/python-3.12-blue)
+![Versione Flask](https://img.shields.io/badge/flask-3.1.0-blue)
 
-## Table of Contents
-- [About The Project](#about-the-project)
-- [Features](#features)
-- [Demo Screenshots](#demo-screenshots)
-- [Getting Started](#getting-started)
-- [How to Use](#how-to-use)
-- [Building Your Own Executable](#building-your-own-executable)
-- [Documentation](#documentation)
-- [Dependencies](#dependencies)
-- [License](#license)
-- [Contributing](#contributing)
-- [Development](#development)
-- [CI/CD Pipeline (Automated Releases)](#cicd-pipeline-automated-releases)
-- [Roadmap / Future Enhancements](#roadmap--future-enhancements)
-- [Contact](#contact)
+**Un'applicazione web per calcolare gli Indicatori Chiave di Prestazione (KPI) da bilanci conformi ai principi contabili italiani (OIC, formato CEE).**
 
-## About The Project
+## Indice
+- [Informazioni sul Progetto](#informazioni-sul-progetto)
+- [Funzionalità](#funzionalità)
+- [Screenshot Dimostrativi](#screenshot-dimostrativi)
+- [Guida all'Installazione](#guida-allinstallazione)
+- [Come si Usa](#come-si-usa)
+- [Creare il Proprio Eseguibile](#creare-il-proprio-eseguibile)
+- [Documentazione](#documentazione)
+- [Dipendenze](#dipendenze)
+- [Licenza](#licenza)
+- [Contribuire](#contribuire)
+- [Sviluppo](#sviluppo)
+- [CI/CD Pipeline (Rilasci Automatici)](#cicd-pipeline-rilasci-automatici)
+- [Roadmap / Sviluppi Futuri](#roadmap--sviluppi-futuri)
+- [Contatti](#contatti)
 
-KPI CEE is a Flask-based web tool designed for financial analysts, accountants, students, and business owners. It simplifies the analysis of financial statements by automatically calculating key financial ratios and KPIs based on the structure defined by the Italian Civil Code (Art. 2424 Codice Civile - CEE format).
+## Informazioni sul Progetto
 
-This is an open-source project, free to use, modify, and distribute. Use it as a learning tool, a quick calculator, or adapt it to your specific needs!
+KPI CEE è uno strumento web basato su Flask pensato per analisti finanziari, commercialisti, studenti e imprenditori. Semplifica l'analisi dei bilanci calcolando automaticamente i principali indicatori finanziari (KPI) secondo la struttura definita dal Codice Civile Italiano (Art. 2424 - formato CEE).
 
-## Features
+Il progetto è open source, gratuito da usare, modificare e distribuire. Usalo come strumento di apprendimento, calcolatore rapido o adattalo alle tue esigenze!
 
-- **Italian GAAP Compliance**: Structured around the official CEE format.
-- **Multiple KPI Calculations**: Including Current Ratio, Quick Ratio, Debt to Equity, and more.
-- **Intuitive Web Interface**: Easily select KPIs and input financial data.
-- **Detailed Results**: View calculated KPIs with interpretations.
-- **PDF Export**: Print KPI results (summary or full report with input data) to PDF directly from your browser.
+## Funzionalità
 
-## Demo Screenshots
+- **Conformità ai Principi Contabili Italiani (OIC):** Strutturato secondo il formato CEE ufficiale.
+- **Calcolo di molteplici KPI:** Inclusi Current Ratio, Quick Ratio, Debt to Equity e altri.
+- **Interfaccia Web Intuitiva:** Seleziona facilmente i KPI e inserisci i dati di bilancio.
+- **Risultati Dettagliati:** Visualizza i KPI calcolati con interpretazioni.
+- **Esportazione PDF:** Stampa i risultati (sintesi o report completo) direttamente dal browser.
 
-Below are example screenshots demonstrating the main features and workflow of the KPI Analyzer:
+## Screenshot Dimostrativi
 
-*The data utilized in these screenshots is available in the `demo-screenshots/data` folder.*
+Di seguito alcuni screenshot che illustrano le principali funzionalità e il flusso di lavoro dell'applicazione:
 
-### KPI Selection
+*I dati utilizzati negli screenshot sono disponibili nella cartella `demo-screenshots/data`.*
 
-![Screenshot of KPI selection page, showing available KPIs to choose](demo-screenshots/selezione%20kpi.png)
-*Choose which KPIs to calculate from the available list.*
+### Selezione KPI
 
-### KPI Selection (Scrolled)
+![Screenshot della pagina di selezione KPI, con l'elenco degli indicatori disponibili](demo-screenshots/selezione%20kpi.png)
+*Scegli quali KPI calcolare dall'elenco disponibile.*
 
-![Screenshot of KPI selection page after scrolling, showing more KPI options](demo-screenshots/selezione%20kpi_1.png)
-*View of the KPI selection page after scrolling down to see more options.*
+### Selezione KPI (Scorrimento)
 
-### Data Entry
+![Screenshot della pagina di selezione KPI dopo lo scorrimento, con più opzioni visibili](demo-screenshots/selezione%20kpi_1.png)
+*Vista della pagina di selezione KPI dopo aver effettuato lo scroll per vedere più opzioni.*
 
-![Screenshot of data entry page, where users input financial statement data](demo-screenshots/inserimento%20dati.png)
-*Enter the required financial statement data for KPI calculation.*
+### Inserimento Dati
 
-### Results
+![Screenshot della pagina di inserimento dati, dove l'utente inserisce i dati di bilancio](demo-screenshots/inserimento%20dati.png)
+*Inserisci i dati di bilancio richiesti per il calcolo dei KPI.*
 
-![Screenshot of results page, displaying calculated KPIs and their interpretations](demo-screenshots/risultati.png)
-*View the calculated KPIs and their interpretations.*
+### Risultati
 
-## Getting Started
+![Screenshot della pagina dei risultati, con i KPI calcolati e le relative interpretazioni](demo-screenshots/risultati.png)
+*Visualizza i KPI calcolati e le relative interpretazioni.*
 
-There are two main ways to use KPI CEE:
+## Guida all'Installazione
 
-### 1. Using Pre-built Releases (Windows & Linux)
+Ci sono due modi principali per utilizzare KPI CEE:
 
-Download ready-to-run executables for Windows and Linux. For macOS, running from source (see below) is the recommended method.
+### 1. Utilizzo dei Rilasci Precompilati (Windows & Linux)
 
-1. Go to the **[Releases Page](https://github.com/VincenzoRocchi/kpi_cee/releases)**.
-2. Download the archive for your OS (e.g., `kpi_cee-windows.zip` or `kpi_cee-linux.tar.gz`).
-3. Extract the archive.
-4. Run the `kpi_cee` executable found inside the extracted folder.
+Scarica gli eseguibili già pronti per Windows e Linux. Per macOS si consiglia l'esecuzione dal codice sorgente (vedi sotto).
 
-For more detailed OS-specific instructions, see the **[Installation Guide in our Docs](./docs/01_installation.md)** (Note: macOS executable instructions may be outdated).
+1. Vai alla **[pagina dei rilasci](https://github.com/VincenzoRocchi/kpi_cee/releases)**.
+2. Scarica l'archivio per il tuo sistema operativo (es. `kpi_cee-windows.zip` o `kpi_cee-linux.tar.gz`).
+3. Estrai l'archivio.
+4. Avvia l'eseguibile `kpi_cee` presente nella cartella estratta.
 
-### 2. Running from Source Code (Recommended for macOS, also for Windows/Linux)
+Per istruzioni dettagliate e specifiche per il sistema operativo, consulta la **[Guida all'Installazione nei Docs](./docs/01_installation.md)** (Nota: le istruzioni per macOS potrebbero non essere aggiornate).
 
-This gives you more flexibility, is the best way to get the latest updates, and is great if you want to see the code or modify it.
+### 2. Esecuzione dal Codice Sorgente (Consigliato per macOS, valido anche per Windows/Linux)
 
-#### Installing `uv` (Recommended Package Installer)
+Questo metodo offre maggiore flessibilità, permette di ricevere gli ultimi aggiornamenti ed è ideale se vuoi vedere o modificare il codice.
 
-We recommend using [`uv`](https://docs.astral.sh/uv/getting-started/installation/) for fast Python package management. Please refer to the [official uv installation guide](https://docs.astral.sh/uv/getting-started/installation/) or a [YouTube tutorial](https://www.youtube.com/results?search_query=python+uv+installer) for up-to-date installation instructions.
+#### Installazione di `uv` (Gestore di pacchetti consigliato)
 
-#### Setup Steps
+Si consiglia di utilizzare [`uv`](https://docs.astral.sh/uv/getting-started/installation/) per una gestione rapida dei pacchetti Python. Fai riferimento alla [guida ufficiale di installazione di uv](https://docs.astral.sh/uv/getting-started/installation/) o a un [tutorial su YouTube](https://www.youtube.com/results?search_query=python+uv+installer) per istruzioni aggiornate.
 
-1. **Prerequisites:**
-    - **Python:** Version 3.10 or newer is recommended.
-        - **macOS:** The easiest way to install Python is using [Homebrew](https://brew.sh/). Once Homebrew is installed, run: `brew install python`
-        - **Windows/Linux:** Download from the [official Python website](https://www.python.org/downloads/) or use your system's package manager (e.g., `apt` on Debian/Ubuntu).
-    - **Git:** To clone the repository. ([Install Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)).
+#### Passaggi di Setup
 
-2. **Clone the repository:**
+1. **Prerequisiti:**
+    - **Python:** Si consiglia la versione 3.10 o superiore.
+        - **macOS:** Il modo più semplice per installare Python è tramite [Homebrew](https://brew.sh/). Una volta installato Homebrew, esegui: `brew install python`
+        - **Windows/Linux:** Scarica Python dal [sito ufficiale](https://www.python.org/downloads/) o usa il gestore pacchetti del tuo sistema (es. `apt` su Debian/Ubuntu).
+    - **Git:** Per clonare il repository ([Guida all'installazione di Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)).
+
+2. **Clona il repository:**
 
     ```bash
     git clone https://github.com/VincenzoRocchi/kpi_cee.git
     cd kpi_cee
     ```
 
-3. **Set up a Python virtual environment:**
-    - **Using `uv` (Recommended):**
+3. **Crea un ambiente virtuale Python:**
+    - **Con `uv` (consigliato):**
 
         ```bash
         uv venv
-        # Activate the environment (uv will show the command, usually:)
-        # On macOS/Linux: source .venv/bin/activate
-        # On Windows: .venv\Scripts\activate
+        # Attiva l'ambiente virtuale (uv mostrerà il comando, di solito:)
+        # Su macOS/Linux: source .venv/bin/activate
+        # Su Windows: .venv\Scripts\activate
         ```
 
-    - **Using standard `venv`:**
+    - **Con `venv` standard:**
 
         ```bash
         python -m venv venv
-        # On Windows: venv\Scripts\activate
-        # On macOS/Linux: source venv/bin/activate
+        # Su Windows: venv\Scripts\activate
+        # Su macOS/Linux: source venv/bin/activate
         ```
 
-4. **Install dependencies:**
-    - **Using `uv` (Recommended, installs from `pyproject.toml`):
+4. **Installa le dipendenze:**
+    - **Con `uv` (consigliato, installa da `pyproject.toml`):**
 
         ```bash
         uv pip install -e .
         ```
 
-    - **Using `pip` (installs Flask from `requirements.txt`):
+    - **Con `pip` (installa Flask da `requirements.txt`):**
 
         ```bash
-        pip install -r requirements.txt 
-        # Note: For development tools like pytest and PyInstaller, 
-        # ensure they are installed separately if not using the uv command above,
-        # or if they are removed from pyproject.toml's main dependencies in the future.
+        pip install -r requirements.txt
+        # Nota: Per strumenti di sviluppo come pytest e PyInstaller,
+        # assicurati che siano installati separatamente se non usi il comando uv sopra,
+        # o se in futuro verranno rimossi dalle dipendenze principali di pyproject.toml.
         ```
 
-5. **Set `SECRET_KEY` (Rarely Needed for Local Use):**
-    Flask uses a `SECRET_KEY` for session management. This application will automatically generate a temporary key if one isn't set, which is perfectly fine for its typical local, in-memory operation. If you have a specific need to set it (e.g., advanced session testing), you can do so:
-    - macOS/Linux (in your terminal):
+5. **Imposta `SECRET_KEY` (raramente necessario per uso locale):**
+    Flask utilizza una `SECRET_KEY` per la gestione delle sessioni. L'applicazione genera automaticamente una chiave temporanea se non viene impostata, sufficiente per l'uso locale. Se necessario, puoi impostarla manualmente:
+    - macOS/Linux (nel terminale):
 
         ```bash
-        export SECRET_KEY='my_local_dev_key'
+        export SECRET_KEY='mia_chiave_locale'
         ```
 
-    - Windows (Command Prompt):
+    - Windows (Prompt dei comandi):
 
         ```bash
-        set SECRET_KEY=my_local_dev_key
+        set SECRET_KEY=mia_chiave_locale
         ```
 
-6. **Run the application:**
+6. **Avvia l'applicazione:**
 
     ```bash
     python app.py
     ```
 
-    Open your browser and go to `http://127.0.0.1:5001`.
+    Apri il browser e vai su `http://127.0.0.1:5001`.
 
-For further details, refer to the **[Installation Guide for Running from Source](./docs/01_installation.md#option-2-running-from-source-code)**.
+Per ulteriori dettagli, consulta la **[Guida all'Installazione per l'Esecuzione dal Sorgente](./docs/01_installation.md#option-2-running-from-source-code)**.
 
-## How to Use
+## Come si Usa
 
-1. Open your browser and go to `http://127.0.0.1:5001` after starting the application.
-2. Select the KPIs you want to calculate from the list.
-3. Enter the required financial statement data.
-4. View the calculated KPIs and their interpretations on the results page.
-5. Optionally, export the results to PDF.
+1. Dopo aver avviato l'applicazione, apri il browser e vai su `http://127.0.0.1:5001`.
+2. Seleziona i KPI che vuoi calcolare dall'elenco.
+3. Inserisci i dati di bilancio richiesti.
+4. Visualizza i KPI calcolati e le relative interpretazioni nella pagina dei risultati.
+5. Opzionalmente, esporta i risultati in PDF.
 
-## Building Your Own Executable
+## Creare il Proprio Eseguibile
 
-If you've modified the code or want to package it yourself, you can build your own executables using PyInstaller.
+Se hai modificato il codice o vuoi creare un eseguibile personalizzato, puoi utilizzare PyInstaller.
 
-Detailed instructions are available in the **[Building from Source Guide](./docs/02_building_from_source.md)**.
+Istruzioni dettagliate sono disponibili nella **[Guida alla compilazione dai sorgenti](./docs/02_building_from_source.md)**.
 
-## Documentation
+## Documentazione
 
-For more in-depth information, including project structure and contribution guidelines, please visit our main **[Documentation Hub](./docs/README.md)**.
+Per informazioni più approfondite, inclusa la struttura del progetto e le linee guida per contribuire, visita la nostra **[Documentazione](./docs/README.md)**.
 
-## Dependencies
+## Dipendenze
 
-- Python 3.10+ (3.12 recommended)
+- Python 3.10+ (3.12 consigliato)
 - Flask >=3.0.0
-(See `requirements.txt` for the exact Flask version).
+(Consulta `requirements.txt` per la versione esatta di Flask).
 
-## License
+## Licenza
 
-This project is licensed under the terms detailed in the [LICENSE](./LICENSE) file.
+Questo progetto è distribuito secondo i termini descritti nel file [LICENSE](./LICENSE).
 
-## Contributing
+## Contribuire
 
-Contributions, suggestions, and bug reports are welcome! Please see our **[Contributing Guide](./docs/04_contributing.md)** for more details.
+Contributi, suggerimenti e segnalazioni di bug sono benvenuti! Consulta la nostra **[Guida per i contributori](./docs/04_contributing.md)** per maggiori dettagli.
 
-## Development
+## Sviluppo
 
-If you're contributing or modifying the code:
+Se vuoi contribuire o modificare il codice:
 
-- Follow the "Running from Source" steps above to set up your environment, preferably using `uv`.
-- If you used `uv pip install -e .` or installed the project from `pyproject.toml`, development tools like `pytest` (for testing) and `PyInstaller` (for building executables, if you choose to) are already installed as they are listed in `pyproject.toml`.
-- Run tests using Pytest:
+- Segui i passaggi della sezione "Esecuzione dal Sorgente" per configurare l'ambiente, preferibilmente usando `uv`.
+- Se hai usato `uv pip install -e .` o hai installato il progetto da `pyproject.toml`, gli strumenti di sviluppo come `pytest` (per i test) e `PyInstaller` (per creare eseguibili) sono già installati.
+- Esegui i test con Pytest:
 
     ```bash
     pytest
     ```
 
-## CI/CD Pipeline (Automated Releases)
+## CI/CD Pipeline (Rilasci Automatici)
 
-This project uses GitHub Actions to automatically build executables for Windows and Linux, and create GitHub Releases when a new version tag (e.g., `v0.3.0`) is pushed. See the [workflow file](./.github/workflows/release.yml) for details.
+Questo progetto utilizza GitHub Actions per compilare automaticamente gli eseguibili per Windows e Linux e creare un nuovo rilascio GitHub quando viene pubblicato un nuovo tag di versione (es. `v0.3.0`). Consulta il [workflow](./.github/workflows/release.yml) per i dettagli.
 
-## Roadmap / Future Enhancements
+## Roadmap / Sviluppi Futuri
 
-Planned features and improvements:
+Funzionalità e miglioramenti previsti:
+- Supporto multilingua (italiano/inglese)
+- Possibile supporto per altri standard di bilancio (es. IFRS)
+- Più mapping e possibilità di standardizzarli per vari casi d'uso
+- Mapping personalizzabili dall'utente (l'utente può implementare la propria logica di mapping se necessario)
 
-- Double language support (English/Italian)
-- Possible support for additional balance sheet standards (e.g., IFRS)
-- More mappings and the ability to standardize them for various use cases
-- User-customizable mappings (users can implement their own mapping logic if needed)
+## Contatti
 
-## Contact
-
-For questions, support, or suggestions, please open an issue on the [GitHub Issues page](https://github.com/VincenzoRocchi/kpi_cee/issues) or contact the maintainer via the email listed in the repository profile.
+Per domande, supporto o suggerimenti, apri una issue sulla [pagina GitHub Issues](https://github.com/VincenzoRocchi/kpi_cee/issues) o contatta il maintainer tramite l'email indicata nel profilo del repository.
