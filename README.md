@@ -2,6 +2,8 @@
 
 # italian-gaap-kpi-analyzer (Calcolatore KPI per Bilanci Italiani) - Versione 0.3.x
 
+An English version of this README is available here: [README.en.md](./README.en.md)
+
 <!-- Badge: Licenza, Versione Python, Versione Flask -->
 ![Licenza](https://img.shields.io/github/license/VincenzoRocchi/kpi_cee)
 ![Versione Python](https://img.shields.io/badge/python-3.12-blue)
