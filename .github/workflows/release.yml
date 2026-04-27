@@ -38,17 +38,17 @@ jobs:
       contents: write
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
     - name: Download artifact
       uses: actions/download-artifact@v4
+      with:
+        name: kpi_cee-linux
 
     - name: Create Release
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         TAG: ${{ github.ref_name }}
       run: |
+        ls -la
         cat > release_notes.md << 'EOF'
         ## Release ${{ github.ref_name }}
         
