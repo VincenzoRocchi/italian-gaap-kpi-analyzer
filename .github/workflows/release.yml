@@ -32,16 +32,16 @@ jobs:
       with:
         targets: ${{ matrix.target }}
 
-    - name: Build with Cargo
-      run: cargo build --release --target ${{ matrix.target }}
+    - name: Build with Cargo (native)
+      run: cargo build --release
 
     - name: Package executable (Linux)
       if: matrix.os_name == 'linux'
-      run: tar -czvf ${{ matrix.packaged_asset }} -C target/${{ matrix.target }}/release kpi_cee
+      run: tar -czvf ${{ matrix.packaged_asset }} -C target/release kpi_cee
 
     - name: Package executable (Windows)
       if: matrix.os_name == 'windows'
-      run: Compress-Archive -Path target/${{ matrix.target }}/release/kpi_cee.exe -DestinationPath ${{ matrix.packaged_asset }}
+      run: Compress-Archive -Path target/release/kpi_cee.exe -DestinationPath ${{ matrix.packaged_asset }}
       shell: powershell
 
     - name: Upload distributable as artifact
