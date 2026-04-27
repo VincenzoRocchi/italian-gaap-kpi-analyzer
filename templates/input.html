@@ -11,6 +11,11 @@
         <h1><strong>Inserisci</strong> i Dati di bilancio</h1>
         
         <form action="/calculate" method="post" id="input-data-form">
+            <!-- Hidden fields for selected KPIs -->
+            {% for kpi in selected_kpis %}
+                <input type="hidden" name="kpi_keys[]" value="{{ kpi }}">
+            {% endfor %}
+            
             <div class="row g-4">
                 <!-- ATTIVO Column -->
                 <div class="col-md-6">

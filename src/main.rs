@@ -1,7 +1,7 @@
 mod app_logic;
 
 use axum::{
-    extract::Form,
+    extract::{Form, Query, State},
     response::{Html, Redirect},
     routing::get,
     Router,
@@ -43,6 +43,7 @@ struct KpiItem {
 struct InputTemplate {
     assets: Vec<PositionInput>,
     liabilities_equity: Vec<PositionInput>,
+    selected_kpis: Vec<String>,
 }
 
 struct PositionInput {
@@ -105,7 +106,7 @@ async fn index() -> Html<String> {
     Html(template.render().unwrap())
 }
 
-async fn input_page() -> Html<String> {
+async fn input_page(query: axum::extract::Query<BTreeMap<String, String>>) -> Html<String> {
     let position_names = get_position_names();
     
     let mut assets = Vec::new();
@@ -127,12 +128,19 @@ async fn input_page() -> Html<String> {
         }
     }
     
-    let template = InputTemplate { assets, liabilities_equity };
+    // Get selected KPIs from query params
+    let selected_kpis: Vec<String> = query.get("kpis")
+        .map(|s| s.split(',').map(|k| k.trim().to_string()).collect())
+        .unwrap_or_else(|| vec![]);
+    
+    let template = InputTemplate { assets, liabilities_equity, selected_kpis };
     Html(template.render().unwrap())
 }
 
 async fn process_kpi_selection(Form(form): Form<KpiSelectionForm>) -> Redirect {
-    Redirect::to("/input")
+    let kpi_keys: Vec<String> = form.kpi_keys.clone();
+    let kpi_list = kpi_keys.join(",");
+    Redirect::to(&format!("/input?kpis={}", kpi_list))
 }
 
 async fn show_results() -> Html<String> {
