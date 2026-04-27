@@ -1,0 +1,22 @@
+[package]
+name = "italian-gaap-kpi-analyzer"
+version = "0.3.4"
+edition = "2021"
+description = "A web application for calculating KPIs from Italian GAAP-compliant balance sheets (OIC, CEE format)"
+authors = ["Vincenzo Rocchi"]
+license = "MIT"
+
+[dependencies]
+axum = "0.7"
+tokio = { version = "1", features = ["full"] }
+askama = "0.12"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+tower = "0.4"
+tower-http = { version = "0.5", features = ["full"] }
+chrono = { version = "0.4", features = ["serde"] }
+validator = "0.18"
+thiserror = "1.0"
+anyhow = "1.0"
+num-traits = "0.2"
+askama_axum = "0.4"

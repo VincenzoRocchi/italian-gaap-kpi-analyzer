@@ -1,109 +1,36 @@
-{% extends "base.html" %}
-
-{% block title %}Seleziona KPI{% endblock %}
-
-{% block content %}
-<div class="container mt-4">
-    <form action="{{ url_for('input_required_fields') }}" method="post">
-        <h1><strong>Seleziona</strong> gli Indicatori (KPI) da Calcolare</h1>
-        <hr>
-        <p class="text-muted mb-4">Scegli uno o più indicatori cliccando sulle relative schede. Verranno richiesti solo i dati necessari per i calcoli selezionati.</p>
-
-        {# Buttons for Select/Deselect All and Proceed on the same line #}
-        <div class="mb-3 d-flex justify-content-between align-items-center">
-            {# Group for Select/Deselect All buttons on the left #}
-            <div>
-                <button type="button" class="btn btn-outline-primary me-2" id="selectAllKpisButton">
-                    <i class="bi bi-check-square-fill me-1"></i> Seleziona Tutti
-                </button>
-                <button type="button" class="btn btn-outline-secondary" id="deselectAllKpisButton">
-                    <i class="bi bi-square me-1"></i> Deseleziona Tutti
-                </button>
-            </div>
-
-            {# Proceed button on the right #}
-            <div>
-                <button type="submit" class="btn btn-primary">Procedi all'Inserimento Dati <i class="bi bi-arrow-right-circle-fill ms-1"></i></button>
-            </div>
-        </div>
-
-        {# KPI Tiles using Bootstrap Grid and Cards - Now Grouped #}
-        {% for category_name, kpis_in_category in grouped_kpis.items() %}
-            <h3 class="mt-4 mb-3">{{ category_name }}</h3>
-            <div class="row g-3 mb-4 kpi-selection-grid">
-                {% for key, kpi in kpis_in_category.items() %}
-                <div class="col-md-6 col-lg-4">
-                    <div class="card kpi-tile h-100"> 
-                        <input class="form-check-input kpi-checkbox" 
-                               type="checkbox" 
-                               name="kpi_keys" 
-                               value="{{ key }}" 
-                               id="kpi-{{ key }}">
-                        <div class="card-body d-flex flex-column"> 
-                            <label class="flex-grow-1" 
-                                   for="kpi-{{ key }}"
-                                   data-bs-toggle="tooltip" 
-                                   data-bs-html="true" 
-                                   data-bs-placement="top"
-                                   title="<strong class='text-primary'>{{ kpi.name_display }} {% if kpi.is_crisis_law_kpi %}(CCI){% endif %}</strong><br>
-                                          <strong>Formula:</strong> {{ kpi.tooltip_info.formula_display }}<br>
-                                          <strong>Range Ottimale:</strong> {{ kpi.tooltip_info.optimal_range_cee }}<br>
-                                          <strong>Interpretazione:</strong> {{ kpi.tooltip_info.interpretation_notes }}">
-                                <h5 class="card-title mb-2 d-flex justify-content-between align-items-start">
-                                    <span>{{ kpi.name_display.replace('Indice di ', '') }}</span>
-                                    {% if kpi.is_crisis_law_kpi %}
-                                        <span class="badge bg-warning text-dark ms-2" style="font-size: 0.6rem; padding: 0.2em 0.4em;" title="Indicatore Codice Crisi Impresa">CCI</span>
-                                    {% endif %}
-                                </h5>
-                                <p class="card-text small text-muted flex-grow-1">{{ kpi.description_short }}</p>
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KPI CEE Analyzer - Selezione KPI</title>
+    <link href="/static/css/style.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1>KPI CEE Analyzer</h1>
+        <p class="version">Versione 0.3.4 Beta</p>
+        
+        <form action="/input" method="post">
+            <h2>Seleziona i KPI da calcolare:</h2>
+            
+            {% for category in categories %}
+                <div class="category">
+                    <h3>{{ category.name }}</h3>
+                    {% for kpi in category.kpis %}
+                        <div class="kpi-item">
+                            <label>
+                                <input type="checkbox" name="kpi_keys" value="{{ kpi.key }}">
+                                <strong>{{ kpi.name }}</strong>
                             </label>
+                            <p class="description">{{ kpi.description }}</p>
                         </div>
-                    </div>
+                    {% endfor %}
                 </div>
-                {% endfor %}
-            </div>
-        {% endfor %}
-
-        <hr class="my-4">
-        <div class="d-flex justify-content-end mb-4">
-            <button type="submit" class="btn btn-primary">Procedi all'Inserimento Dati <i class="bi bi-arrow-right-circle-fill ms-1"></i></button>
-        </div>
-    </form>
-</div>
-{% endblock %}
-
-{% block scripts %}
-{{ super() }} {# Include scripts from base.html if any #}
-<script>
-// Enable Bootstrap tooltips allowing HTML
-var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-  return new bootstrap.Tooltip(tooltipTriggerEl, {
-    html: true // Allow HTML content in tooltips
-  })
-})
-
-// Select/Deselect All KPIs
-document.addEventListener('DOMContentLoaded', function() {
-    const selectAllButton = document.getElementById('selectAllKpisButton');
-    const deselectAllButton = document.getElementById('deselectAllKpisButton');
-    const kpiCheckboxes = document.querySelectorAll('input[name="kpi_keys"]');
-
-    if (selectAllButton) {
-        selectAllButton.addEventListener('click', function() {
-            kpiCheckboxes.forEach(function(checkbox) {
-                checkbox.checked = true;
-            });
-        });
-    }
-
-    if (deselectAllButton) {
-        deselectAllButton.addEventListener('click', function() {
-            kpiCheckboxes.forEach(function(checkbox) {
-                checkbox.checked = false;
-            });
-        });
-    }
-});
-</script>
-{% endblock %} 
+            {% endfor %}
+            
+            <button type="submit" class="btn-primary">Procedi all'inserimento dati</button>
+        </form>
+    </div>
+</body>
+</html>
