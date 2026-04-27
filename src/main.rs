@@ -1,7 +1,7 @@
 mod app_logic;
 
 use axum::{
-    extract::{Form, Query, State},
+    extract::Form,
     response::{Html, Redirect},
     routing::get,
     Router,

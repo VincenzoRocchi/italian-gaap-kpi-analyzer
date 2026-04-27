@@ -32,6 +32,7 @@ pub fn validate_financial_data(
     (validated_data, errors)
 }
 
+#[allow(dead_code)]
 pub fn validate_kpi_selection(
     selected_kpi_keys: &[String],
     available_kpis: &BTreeMap<String, super::kpi_config::KpiDetails>,

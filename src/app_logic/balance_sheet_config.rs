@@ -2,6 +2,7 @@ use std::collections::BTreeMap;
 use serde::{Serialize, Deserialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[allow(dead_code)]
 pub struct BalanceSheetStructure {
     pub assets: Assets,
     pub equity_liabilities: EquityLiabilities,
@@ -87,6 +88,7 @@ pub struct Liabilities {
     pub other_payables: Vec<String>,
 }
 
+#[allow(dead_code)]
 pub fn get_balance_sheet_structure() -> BalanceSheetStructure {
     BalanceSheetStructure {
         assets: Assets {
