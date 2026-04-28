@@ -81,9 +81,11 @@ async fn main() {
         .nest_service("/static", ServeDir::new("static"))
         .with_state(state);
 
-    let listener = tokio::net::TcpListener::bind("127.0.0.1:5001").await.unwrap();
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:5001").await
+        .expect("Porta 5001 già in uso. Chiudi l'istanza precedente.");
     println!("Server running on http://127.0.0.1:5001");
-    axum::serve(listener, app).await.unwrap();
+    axum::serve(listener, app).await
+        .expect("Server error");
 }
 
 async fn index() -> Html<String> {
