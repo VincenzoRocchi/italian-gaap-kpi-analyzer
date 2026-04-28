@@ -150,14 +150,26 @@ async fn show_results() -> Html<String> {
     Html("<html><body><h1>Results</h1><p>KPI calculation results...</p></body></html>".to_string())
 }
 
-async fn calculate_kpis(Form(form): Form<BTreeMap<String, String>>) -> Html<String> {
+async fn calculate_kpis(RawForm(body): RawForm) -> Html<String> {
     let available_kpis = get_available_kpis();
     let kpi_requirements = app_logic::kpi_requirements_logic::get_kpi_requirements();
     
-    // Get selected KPIs from form (kpi_keys[])
-    let selected_kpis: Vec<String> = form.get("kpi_keys[]")
-        .map(|s| vec![s.clone()])
-        .unwrap_or_else(|| vec![]);
+    // Parse form data: extract kpi_keys[] (repeated) and pos_xxx (unique)
+    let mut form: BTreeMap<String, String> = BTreeMap::new();
+    let mut selected_kpis: Vec<String> = Vec::new();
+    
+    for (key, value) in url::form_urlencoded::parse(&body) {
+        let v = value.into_owned();
+        if key == "kpi_keys[]" {
+            selected_kpis.push(v);
+        } else if key.starts_with("pos_") {
+            form.insert(key.into_owned(), v);
+        }
+    }
+    
+    if selected_kpis.is_empty() {
+        return Html("<html><body><h1>Error</h1><p>Nessun KPI selezionato.</p></body></html>".to_string());
+    }
     
     // Get required positions for validation
     let mut required_positions = Vec::new();
