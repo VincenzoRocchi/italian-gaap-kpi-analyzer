@@ -718,7 +718,7 @@ dependencies = [
 
 [[package]]
 name = "italian-gaap-kpi-analyzer"
-version = "0.3.4"
+version = "0.4.0"
 dependencies = [
  "anyhow",
  "askama",
@@ -732,6 +732,7 @@ dependencies = [
  "tokio",
  "tower 0.4.13",
  "tower-http",
+ "url",
  "validator",
 ]
 

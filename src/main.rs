@@ -1,7 +1,7 @@
 mod app_logic;
 
 use axum::{
-    extract::Form,
+    extract::{Form, RawForm},
     response::{Html, Redirect},
     routing::get,
     Router,
@@ -137,8 +137,11 @@ async fn input_page(query: axum::extract::Query<BTreeMap<String, String>>) -> Ht
     Html(template.render().unwrap())
 }
 
-async fn process_kpi_selection(Form(form): Form<KpiSelectionForm>) -> Redirect {
-    let kpi_keys: Vec<String> = form.kpi_keys.clone();
+async fn process_kpi_selection(RawForm(body): RawForm) -> Redirect {
+    let kpi_keys: Vec<String> = url::form_urlencoded::parse(&body)
+        .filter(|(k, _)| k == "kpi_keys")
+        .map(|(_, v)| v.into_owned())
+        .collect();
     let kpi_list = kpi_keys.join(",");
     Redirect::to(&format!("/input?kpis={}", kpi_list))
 }
