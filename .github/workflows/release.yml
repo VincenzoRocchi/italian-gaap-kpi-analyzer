@@ -6,62 +6,86 @@ on:
       - 'v0.4.*'
 
 jobs:
-  build:
+  build-linux:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Install Rust
-      uses: dtolnay/rust-toolchain@stable
-
-    - name: Build
-      run: cargo build --release
-
-    - name: Create Linux tarball
+    - uses: actions/checkout@v4
+    - uses: dtolnay/rust-toolchain@stable
+    - run: cargo build --release
+    - name: Package
       run: |
         mkdir -p kpi_cee
         cp target/release/italian-gaap-kpi-analyzer kpi_cee/kpi_cee
+        chmod +x kpi_cee/kpi_cee
         tar -czvf kpi_cee-linux.tar.gz kpi_cee
-
-    - name: Upload Linux artifact
-      uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v4
       with:
         name: kpi_cee-linux
         path: kpi_cee-linux.tar.gz
 
+  build-windows:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: dtolnay/rust-toolchain@stable
+    - run: cargo build --release
+    - name: Package
+      run: Compress-Archive -Path target/release/italian-gaap-kpi-analyzer.exe -DestinationPath kpi_cee-windows.zip
+      shell: powershell
+    - uses: actions/upload-artifact@v4
+      with:
+        name: kpi_cee-windows
+        path: kpi_cee-windows.zip
+
   release:
+    needs: [build-linux, build-windows]
     runs-on: ubuntu-latest
-    needs: build
     permissions:
       contents: write
-
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
-    - name: Download artifact
-      uses: actions/download-artifact@v4
+    - uses: actions/download-artifact@v4
       with:
         name: kpi_cee-linux
+
+    - uses: actions/download-artifact@v4
+      with:
+        name: kpi_cee-windows
 
     - name: Create Release
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         TAG: ${{ github.ref_name }}
       run: |
-        ls -la
-        cat > release_notes.md << 'EOF'
+        cat > release_notes.md << 'NOTES'
         ## Release ${{ github.ref_name }}
-        
-        KPI CEE Analyzer - Rust version.
-        
-        ### How to Run:
-        **Linux:** `tar -xzvf kpi_cee-linux.tar.gz && cd kpi_cee && ./italian-gaap-kpi-analyzer`
-        EOF
-        
+
+        KPI CEE Analyzer — Rust port. 19 KPI finanziari da bilancio CEE (OIC).
+
+        ### Installazione
+
+        **Linux:**
+        ```
+        tar -xzvf kpi_cee-linux.tar.gz
+        cd kpi_cee
+        ./kpi_cee
+        ```
+        Apri http://127.0.0.1:5001 nel browser.
+
+        **Windows:**
+        ```
+        # Estrai kpi_cee-windows.zip
+        # Esegui kpi_cee.exe
+        ```
+        Apri http://127.0.0.1:5001 nel browser.
+
+        ### Changelog
+        Vedi `CHANGELOG.md` per i dettagli completi.
+        NOTES
+
         gh release create ${TAG} \
-          --title "Release ${TAG}" \
+          --title "v${{ github.ref_name }} - Rust port" \
           --notes-file release_notes.md \
-          kpi_cee-linux.tar.gz
+          kpi_cee-linux.tar.gz \
+          kpi_cee-windows.zip

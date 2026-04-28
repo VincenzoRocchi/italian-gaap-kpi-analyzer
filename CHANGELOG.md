@@ -1,9 +1,26 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+## [0.4.0] - 2026-04-28
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+### Added
+
+- Complete Rust port from Python/Flask to Rust/Axum/Askama
+- 19 KPI finanziari: current_ratio, quick_ratio, cash_ratio, debt_to_equity, debt_ratio, working_capital, asset_rigidity_index, asset_elasticity_index, fixed_asset_coverage_ratio, tax_social_debt_on_assets_ratio, tangible_net_worth, equity_multiplier, long_term_debt_to_equity, intangible_assets_ratio, financial_assets_ratio, non_current_assets_coverage, net_working_capital_ratio, debt_to_equity_excl_tfr, debt_ratio_excl_tfr
+- Askama templates for KPI selection, balance sheet input, and results display
+- Native binary builds for Linux and Windows via GitHub Actions
+
+### Changed
+
+- Web framework: Flask (Python) → Axum (Rust)
+- Templating: Jinja2 → Askama
+- Binary build: PyInstaller → cargo build --release
+- Application server now binds on `127.0.0.1:5001`
+
+### Removed
+
+- All Python source files (`app.py`, `app_logic/*.py`, `requirements.txt`, `pyproject.toml`, `kpi_cee.spec`)
+- Python dependencies and virtual environment configuration
+- Flask session management (to be reimplemented in Rust if needed)
 
 ## [0.3.4 Beta] - 2025-05-21
 
