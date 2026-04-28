@@ -85,7 +85,7 @@ jobs:
         NOTES
 
         gh release create ${TAG} \
-          --title "v${{ github.ref_name }} - Rust port" \
+          --title "${{ github.ref_name }} - Rust port" \
           --notes-file release_notes.md \
           kpi_cee-linux.tar.gz \
           kpi_cee-windows.zip
